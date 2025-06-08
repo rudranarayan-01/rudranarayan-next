@@ -166,7 +166,7 @@ export const personalInfo = {
   pfp: "/img/profilepic.webp",
   alt: "Sample Profile Pic",
   summary:
-    "I'm a passionate AI-Powered Full-Stack Developer who enjoys building and exploring new technologies. Always learning and creating innovative solutions.",
+    "I'm a passionate AI-Powered Full-Stack Developer who enjoys building and exploring new technologies. Always learning and creating innovative solutions. I'm currently looking for new opportunities to contribute and innovate.",
   location: "Bhubaneswar, India",
 };
 

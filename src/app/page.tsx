@@ -6,8 +6,7 @@ import Footer from "./components/Footer";
 import Header from "./components/Header";
 import Hero from "./components/Hero";
 import Projects from "./components/Projects";
-import { GiAchievement } from "react-icons/gi";
-import Achievement from "./components/Achievement";
+import Achievements from "./components/Achievement";
 
 export default function Home() {
   const sectionRefs = {
@@ -23,7 +22,7 @@ export default function Home() {
       <Hero ref={sectionRefs.home} />
       <AboutMe ref={sectionRefs.about} />
       <Projects ref={sectionRefs.projects} />
-      <Achievement/>
+      <Achievements/>
       <Contact ref={sectionRefs.contact} />
       <Footer />
     </>
