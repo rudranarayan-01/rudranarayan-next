@@ -14,27 +14,32 @@ const Education = () => {
         <h3 className="text-lg text-neutral-100 font-semibold mb-2">
           Education
         </h3>
-        <p className="text-neutral-100 text-sm flex justify-between">
-          <span className="font-semibold">{education1.college}</span>{" "}
-          <span>{education1.duration}</span>
-        </p>
-        <p className="text-neutral-100 text-sm flex justify-between">
-          <span>{education1.course}</span> <span>CGPA: {education1.cgpa}</span>
-        </p>
+
+        <div className="flex flex-col gap-5">
+
+          <div>
+            <p className="text-neutral-100 text-sm flex justify-between">
+              <span className="font-semibold">{education1.college}</span>{" "}
+              <span>{education1.duration}</span>
+            </p>
+            <p className="text-neutral-100 text-sm flex justify-between">
+              <span>{education1.course}</span> <span>CGPA: {education1.cgpa}</span>
+            </p>
+          </div>
+
+          <div>
+            <p className="text-neutral-100 text-sm flex justify-between">
+              <span className="font-semibold">{education2.college}</span>{" "}
+              <span>{education2.duration}</span>
+            </p>
+            <p className="text-neutral-100 text-sm flex justify-between">
+              <span>{education2.course}</span> <span>CGPA: {education2.cgpa}</span>
+            </p>
+          </div>
+        </div>
+
       </div>
-      
-      <div className="flex flex-col">
-        <h3 className="text-lg text-gray-800 font-semibold mb-2">
-          -----------------------------------------------------------------
-        </h3>
-        <p className="text-neutral-100 text-sm flex justify-between">
-          <span className="font-semibold">{education2.college}</span>{" "}
-          <span>{education2.duration}</span>
-        </p>
-        <p className="text-neutral-100 text-sm flex justify-between">
-          <span>{education2.course}</span> <span>CGPA: {education2.cgpa}</span>
-        </p>
-      </div>
+
     </motion.div>
   );
 };

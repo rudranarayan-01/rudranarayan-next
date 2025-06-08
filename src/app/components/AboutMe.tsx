@@ -36,7 +36,6 @@ const AboutMe = React.forwardRef<HTMLElement, unknown>((_, ref) => {
         <PersonalInfo />
         <motion.div className="lg:w-2/3 p-2 lg:p-6 space-y-4 lg:border-l lg:border-neutral-600">
           <Education />
-          <Experience />
           <Skills />
         </motion.div>
       </div>
