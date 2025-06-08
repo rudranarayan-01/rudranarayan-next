@@ -6,6 +6,7 @@ import { FaGithub, FaLinkedinIn } from "react-icons/fa";
 import { TbUserSquare } from "react-icons/tb";
 import { FaReact, FaNodeJs, FaDatabase, FaServer } from "react-icons/fa";
 import { DiMysql } from "react-icons/di";
+import { TbBrandReactNative } from "react-icons/tb";
 import {
   SiTailwindcss,
   SiExpress,
@@ -28,7 +29,7 @@ import {
 } from "react-icons/si";
 import { LuSquareCode } from "react-icons/lu";
 import { IoLogoGithub } from "react-icons/io";
-import { SiScikitlearn, SiPytorch, SiOpencv, SiTensorflow, SiPandas, SiFlask, SiDjango  } from "react-icons/si";
+import { SiScikitlearn, SiPytorch, SiOpencv, SiTensorflow, SiPandas, SiFlask, SiDjango,SiExpo  } from "react-icons/si";
 
 // List your technical skills below
 export const skills = [
@@ -42,7 +43,9 @@ export const skills = [
   { name: "Django", icon: SiDjango, color: "#092E29" },
   { name: "JavaScript", icon: FaJs, color: "#F7DF1E" },
   { name: "TypeScript", icon: SiTypescript, color: "#3178C6" },
-  { name: "ReactJS", icon: FaReact, color: "#61DAFB" },
+  { name: "ReactJS", icon: FaReact, color: "#61DAFB" },   
+  { name: "ReactNative", icon: TbBrandReactNative, color: "#61DAFB" },   
+  { name: "Expo", icon: SiExpo, color: "#fff" },   
   { name: "NextJS", icon: SiNextdotjs, color: "#ffffff" },
   { name: "Tailwind CSS", icon: SiTailwindcss, color: "#38B2AC" },
   { name: "Framer Motion", icon: SiFramer, color: "#0055FF" },
