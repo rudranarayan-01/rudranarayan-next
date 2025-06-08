@@ -1,10 +1,11 @@
 // Update this file with your personal information to customize your portfolio.
 // Place all images in the "img" folder inside the "public" directory and reference them using the path: "/img/FILE_NAME".
-
+import { BiLogoPython, BiLogoPostgresql } from "react-icons/bi";
 import { FiHome, FiMail } from "react-icons/fi";
 import { FaGithub, FaLinkedinIn } from "react-icons/fa";
 import { TbUserSquare } from "react-icons/tb";
 import { FaReact, FaNodeJs, FaDatabase, FaServer } from "react-icons/fa";
+import { DiMysql } from "react-icons/di";
 import {
   SiTailwindcss,
   SiExpress,
@@ -15,11 +16,7 @@ import {
 } from "react-icons/si";
 
 import {
-  FaHtml5,
-  FaCss3Alt,
   FaJs,
-  FaGit,
-  FaFigma,
   FaCuttlefish,
 } from "react-icons/fa";
 import {
@@ -31,11 +28,18 @@ import {
 } from "react-icons/si";
 import { LuSquareCode } from "react-icons/lu";
 import { IoLogoGithub } from "react-icons/io";
+import { SiScikitlearn, SiPytorch, SiOpencv, SiTensorflow, SiPandas, SiFlask, SiDjango  } from "react-icons/si";
 
 // List your technical skills below
 export const skills = [
-  { name: "HTML", icon: FaHtml5, color: "#E34F26" },
-  { name: "CSS", icon: FaCss3Alt, color: "#1572B6" },
+  { name: "Python", icon: BiLogoPython, color: "#1338BE" },
+  { name: "Pytorch", icon: SiPytorch , color: "#ee4c2c" },
+  { name: "OpenCV", icon: SiOpencv , color: "#fff" },
+  { name: "Pandas", icon: SiPandas , color: "#150499" },
+  { name: "Tensorflow", icon: SiTensorflow , color: "#ff6f00" },
+  { name: "Scikit-Learn", icon: SiScikitlearn, color: "#ffa500" },
+  { name: "Flask", icon: SiFlask, color: "#fff" },
+  { name: "Django", icon: SiDjango, color: "#092E29" },
   { name: "JavaScript", icon: FaJs, color: "#F7DF1E" },
   { name: "TypeScript", icon: SiTypescript, color: "#3178C6" },
   { name: "ReactJS", icon: FaReact, color: "#61DAFB" },
@@ -46,12 +50,11 @@ export const skills = [
   { name: "ExpressJS", icon: SiExpress, color: "#C9D1D9" },
   { name: "MongoDB", icon: SiMongodb, color: "#47A248" },
   { name: "Redux Toolkit", icon: SiRedux, color: "#764ABC" },
-  { name: "Git", icon: FaGit, color: "#F05032" },
   { name: "GitHub", icon: FaGithub, color: "#ffffff" },
   { name: "Vercel", icon: SiVercel, color: "#ffffff" },
-  { name: "Postman", icon: SiPostman, color: "#FF6C37" },
   { name: "C++", icon: FaCuttlefish, color: "#00599C" },
-  { name: "Figma", icon: FaFigma, color: "#F24E1E" },
+  { name: "Mysql ", icon: DiMysql, color: "#F29111 " },
+  { name: "Postgresql ", icon: BiLogoPostgresql, color: "#336791" },
 ];
 
 type NavbarItem = {

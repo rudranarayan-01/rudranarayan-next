@@ -52,7 +52,7 @@ const Projects = React.forwardRef<HTMLElement, unknown>((props, ref) => {
         {projects.map((project, index) => (
           <motion.div
             key={index}
-            className="project flex max-lg:flex-col max-lg:pb-4 bg-neutral-950 gap-4 my-4 shadow-md rounded-2xl overflow-hidden hover:shadow-lg transition sticky border border-neutral-600"
+            className="project flex max-lg:flex-col max-lg:pb-4 bg-neutral-950 gap-4 my-4 shadow-md rounded-2xl hover:shadow-lg transition sticky border border-neutral-600  duration-300 overflow-hidden"
             style={{
               top: `calc(72px + ${index * 30}px)`,
             }}

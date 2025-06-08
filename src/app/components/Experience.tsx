@@ -5,18 +5,18 @@ import { fadeInRight, fadeInUp } from "../data/variants";
 
 const experiences = [
   {
-    role: "Python Developer",
-    company: "Datapirates",
-    duration: "Jan 2024 – Present",
+    role: "Machine Learning Intern",
+    company: "CodeAlpha",
+    duration: "Jan 2025 – Apr 2025",
     description:
-      "Built scalable ML pipelines, integrated cloud APIs, and contributed to real-time data dashboards using FastAPI and Pandas.",
+      "Completed an ML internship where I built predictive models, performed data preprocessing, and evaluated performance using Python tools like Scikit-learn and Pandas. Also contributed to data visualization and collaborative project work.",
   },
   {
-    role: "Full Stack Intern",
-    company: "TechNova",
-    duration: "Feb 2023 – Jul 2023",
+    role: "Full Stack Development Intern",
+    company: "Unified Mentor",
+    duration: "Aug 2024 – Oct 2024",
     description:
-      "Developed full-stack applications with MERN stack. Built dashboards, authentication, and integrated RESTful APIs.",
+      "Completed a Full Stack Development internship where I built and maintained web applications using technologies like React, Node.js, Express, and MongoDB. Worked on both frontend and backend, implemented APIs, and contributed to UI/UX improvements and database integration.",
   },
 ];
 
