@@ -12,13 +12,6 @@ const experiences = [
       "Built scalable ML pipelines, integrated cloud APIs, and contributed to real-time data dashboards using FastAPI and Pandas.",
   },
   {
-    role: "Embedded Intern",
-    company: "IoT Innovators",
-    duration: "Aug 2023 – Dec 2023",
-    description:
-      "Worked with ESP32 and Raspberry Pi to build automation projects, integrating real-time data with MQTT and Firebase.",
-  },
-  {
     role: "Full Stack Intern",
     company: "TechNova",
     duration: "Feb 2023 – Jul 2023",
