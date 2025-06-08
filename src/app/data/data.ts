@@ -1,6 +1,6 @@
 // Update this file with your personal information to customize your portfolio.
 // Place all images in the "img" folder inside the "public" directory and reference them using the path: "/img/FILE_NAME".
-import { BiLogoPython, BiLogoPostgresql } from "react-icons/bi";
+import { BiLogoPython, BiLogoPostgresql, BiLogoFirebase } from "react-icons/bi";
 import { FiHome, FiMail } from "react-icons/fi";
 import { FaGithub, FaLinkedinIn } from "react-icons/fa";
 import { TbUserSquare } from "react-icons/tb";
@@ -58,6 +58,7 @@ export const skills = [
   { name: "C++", icon: FaCuttlefish, color: "#00599C" },
   { name: "Mysql ", icon: DiMysql, color: "#F29111 " },
   { name: "Postgresql ", icon: BiLogoPostgresql, color: "#336791" },
+  { name: "Firebase", icon: BiLogoFirebase, color: "#ffa611" },
 ];
 
 type NavbarItem = {
