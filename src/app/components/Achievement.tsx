@@ -56,7 +56,7 @@ export default function Achievements() {
         >
           HIGHLIGHTS OF MY JOURNEY
         </motion.h4>
-        <motion.h2
+        <motion.h2 
           variants={fadeInUp}
           initial="hidden"
           whileInView="visible"
