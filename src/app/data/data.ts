@@ -163,7 +163,7 @@ export const projects = [
 
 // Update your personal information
 export const personalInfo = {
-  pfp: "/img/profilepic.webp",
+  pfp: "/img/profile.png",
   alt: "Sample Profile Pic",
   summary:
     "I'm a passionate AI-Powered Full-Stack Developer who enjoys building and exploring new technologies. Always learning and creating innovative solutions. I'm currently looking for new opportunities to contribute and innovate.",
