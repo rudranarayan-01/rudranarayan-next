@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { fadeInRight, fadeInUp } from "../data/variants";
 
 const achievements = [
   {
@@ -25,32 +26,65 @@ const achievements = [
   },
 ];
 
+// scroll animation variants
+const container = {
+  hidden: {},
+  show: {
+    transition: {
+      staggerChildren: 0.2,
+    },
+  },
+};
+
+const card = {
+  hidden: { opacity: 0, y: 40 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } },
+};
+
 export default function Achievements() {
   return (
-    <section
-      id="achievements"
-      className="bg-black py-20 px-4 md:px-12 text-white"
-    >
+    <motion.section variants={fadeInUp}
+      initial="hidden"
+      whileInView="visible"
+      className="bg-neutral-950 flex flex-col justify-center items-center text-neutral-100 py-16 px-6">
       <div className="max-w-5xl mx-auto">
-        <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">
+        <motion.h4
+          variants={fadeInRight}
+          initial="initial"
+          whileInView="whileInView"
+          className="text-[15px] text-center text-neutral-300 font-medium"
+        >
+          HIGHLIGHTS OF MY JOURNEY
+        </motion.h4>
+        <motion.h2
+          variants={fadeInUp}
+          initial="hidden"
+          whileInView="visible"
+          className="text-3xl animated-text-gradient md:text-5xl font-semibold pt-2 mb-6 md:mb-10 text-neutral-50 text-center"
+        >
           🎖 Achievements & Organizations
-        </h2>
-        <div className="grid md:grid-cols-2 gap-10">
+        </motion.h2>
+
+        <motion.div
+          variants={container}
+          initial="hidden"
+          whileInView="show"
+          viewport={{ once: true }}
+          className="grid md:grid-cols-2 gap-10"
+        >
           {achievements.map((item, index) => (
             <motion.div
               key={index}
-              initial={{ opacity: 0, y: 40 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: index * 0.1 }}
-              viewport={{ once: true }}
-              className="bg-zinc-900 p-6 rounded-xl shadow-md border border-zinc-800"
+              variants={card}
+              whileHover={{ scale: 1.02 }}
+              className="bg-zinc-900 p-6 rounded-xl shadow-lg border border-zinc-800"
             >
               <h3 className="text-xl font-semibold mb-2">{item.title}</h3>
               <p className="text-zinc-400 text-sm">{item.description}</p>
             </motion.div>
           ))}
-        </div>
+        </motion.div>
       </div>
-    </section>
+    </motion.section>
   );
 }
