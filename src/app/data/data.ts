@@ -7,6 +7,9 @@ import { TbUserSquare } from "react-icons/tb";
 import { FaReact, FaNodeJs, FaDatabase, FaServer } from "react-icons/fa";
 import { DiMysql } from "react-icons/di";
 import { TbBrandReactNative } from "react-icons/tb";
+import { RiNextjsLine } from "react-icons/ri";
+import { SiPython, SiShadcnui } from "react-icons/si";
+import { SiWebdriverio } from "react-icons/si";
 import {
   SiTailwindcss,
   SiExpress,
@@ -29,23 +32,23 @@ import {
 } from "react-icons/si";
 import { LuSquareCode } from "react-icons/lu";
 import { IoLogoGithub } from "react-icons/io";
-import { SiScikitlearn, SiPytorch, SiOpencv, SiTensorflow, SiPandas, SiFlask, SiDjango,SiExpo  } from "react-icons/si";
+import { SiScikitlearn, SiPytorch, SiOpencv, SiTensorflow, SiPandas, SiFlask, SiDjango, SiExpo } from "react-icons/si";
 
 // List your technical skills below
 export const skills = [
   { name: "Python", icon: BiLogoPython, color: "#1338BE" },
-  { name: "Pytorch", icon: SiPytorch , color: "#ee4c2c" },
-  { name: "OpenCV", icon: SiOpencv , color: "#fff" },
-  { name: "Pandas", icon: SiPandas , color: "#150499" },
-  { name: "Tensorflow", icon: SiTensorflow , color: "#ff6f00" },
+  { name: "Pytorch", icon: SiPytorch, color: "#ee4c2c" },
+  { name: "OpenCV", icon: SiOpencv, color: "#fff" },
+  { name: "Pandas", icon: SiPandas, color: "#150499" },
+  { name: "Tensorflow", icon: SiTensorflow, color: "#ff6f00" },
   { name: "Scikit-Learn", icon: SiScikitlearn, color: "#ffa500" },
   { name: "Flask", icon: SiFlask, color: "#fff" },
   { name: "Django", icon: SiDjango, color: "#092E29" },
   { name: "JavaScript", icon: FaJs, color: "#F7DF1E" },
   { name: "TypeScript", icon: SiTypescript, color: "#3178C6" },
-  { name: "ReactJS", icon: FaReact, color: "#61DAFB" },   
-  { name: "ReactNative", icon: TbBrandReactNative, color: "#61DAFB" },   
-  { name: "Expo", icon: SiExpo, color: "#fff" },   
+  { name: "ReactJS", icon: FaReact, color: "#61DAFB" },
+  { name: "ReactNative", icon: TbBrandReactNative, color: "#61DAFB" },
+  { name: "Expo", icon: SiExpo, color: "#fff" },
   { name: "NextJS", icon: SiNextdotjs, color: "#ffffff" },
   { name: "Tailwind CSS", icon: SiTailwindcss, color: "#38B2AC" },
   { name: "Framer Motion", icon: SiFramer, color: "#0055FF" },
@@ -89,84 +92,86 @@ export const navbarData: NavbarItem[] = [
   },
 ];
 
+
+
 // Add your projects here with their descriptions, features, and tech stack.
 export const projects = [
   {
-    name: "Sample Project 1",
-    description: "Description about sample project 1",
+    name: "NextStep-AI",
+    description: "NextStep-AI is your smart career companion, designed to streamline job preparation with AI-powered tools",
     points: [
-      "Feature 1 of the sample project.",
-      "Feature 2 of the sample project.",
-      "Feature 3 of the sample project.",
+      "Get personalized industry insights",
+      "Build professional resumes and cover letter",
+      " Practice with AI-driven interview preparation",
     ],
     techStack: [
-      { name: "React.js", icon: FaReact, color: "#61DAFB" },
+      { name: "Next.js", icon: RiNextjsLine, color: "#fff" },
       { name: "Tailwind CSS", icon: SiTailwindcss, color: "#38B2AC" },
+      { name: "Shadcn-UI", icon: SiShadcnui, color: "#fff" },
       { name: "Node.js", icon: FaNodeJs, color: "#83CD29" },
-      { name: "Express.js", icon: SiExpress, color: "#C9D1D9" },
     ],
-    liveLink: "#",
-    githubLink: "#",
-    image: "/img/projectimage.jfif", // Update with the actual project image
+    liveLink: "https://next-step-ai-zeta.vercel.app/",
+    githubLink: "https://github.com/rudranarayan-01/NextStep-AI",
+    image: "/img/nextstep-ai.png", // Update with the actual project image
   },
   {
-    name: "Sample Project 2",
-    description: "Description about sample project 2",
+    name: "Axel-AI",
+    description: "Smart Mobility with AI & IoT — An autonomous car powered by deep learning and embedded systems.",
     points: [
-      "Feature 1 of the sample project.",
-      "Feature 2 of the sample project.",
-      "Feature 3 of the sample project.",
+      "Real-time traffic sign recognition and smart navigation.",
+      "Obstacle avoidance with cruise control",
+      "Cloud-Connected Intelligence",
     ],
     techStack: [
-      { name: "React.js", icon: FaReact, color: "#61DAFB" },
-      { name: "Redux Toolkit", icon: SiRedux, color: "#764ABC" },
-      { name: "Tailwind CSS", icon: SiTailwindcss, color: "#38B2AC" },
-      { name: "Socket.IO", icon: SiSocketdotio, color: "#ffffff" },
-      { name: "Node.js", icon: FaNodeJs, color: "#83CD29" },
-      { name: "Express.js", icon: SiExpress, color: "#C9D1D9" },
-      { name: "MongoDB", icon: SiMongodb, color: "#47A248" },
+      { name: "Python", icon: SiPython, color: "#1338BE" },
+      { name: "Pytorch", icon: SiPytorch, color: "#ee4c2c" },
+      { name: "Scikit-Learn", icon: SiScikitlearn, color: "#ffa500" },
+      { name: "OpenCV", icon: SiOpencv, color: "#fff" },
+
+
     ],
-    liveLink: "#",
-    githubLink: "#",
-    image: "/img/projectimage.jfif", // Update with the actual project image
+    liveLink: "https://www.linkedin.com/feed/update/urn:li:activity:7328276558060617728/",
+    githubLink: "https://github.com/rudranarayan-01/Axel-AI",
+    image: "/img/svd.jpg", // Update with the actual project image
   },
   {
-    name: "Sample Project 3",
-    description: "Description about sample project 3",
+    name: "AI-Interview",
+    description: "A smart web app that simulates interviews based on user skills and experience for effective job prep.",
     points: [
-      "Feature 1 of the sample project.",
-      "Feature 2 of the sample project.",
-      "Feature 3 of the sample project.",
+      " Personalized Interview Simulation with AI",
+      "Smart Feedback System",
+      "Modern Tech Stack",
     ],
     techStack: [
+      { name: "TypeScript", icon: SiTypescript, color: "#3178C6" },
       { name: "React.js", icon: FaReact, color: "#61DAFB" },
       { name: "Redux Toolkit", icon: SiRedux, color: "#764ABC" },
       { name: "Tailwind CSS", icon: SiTailwindcss, color: "#38B2AC" },
       { name: "Firebase", icon: SiFirebase, color: "#FFCA28" },
     ],
-    liveLink: "#",
-    githubLink: "#",
-    image: "/img/projectimage.jfif", // Update with the actual project image
+    liveLink: "https://ai-inter.netlify.app/",
+    githubLink: "https://github.com/rudranarayan-01/AI-Interview",
+    image: "/img/ai-inter.png", // Update with the actual project image
   },
   {
-    name: "Sample Project 4",
-    description: "Description about sample project 4",
+    name: "LIMMY AI  v1.0",
+    description: "A smart virtual assistant built with Python that understands and responds to voice commands using intelligent automation.",
     points: [
-      "Feature 1 of the sample project.",
-      "Feature 2 of the sample project.",
-      "Feature 3 of the sample project.",
+      "Smart Query Handling",
+      "Multilanguage support",
+      "Capable of interacting with desktop applications",
     ],
     techStack: [
-      { name: "React.js", icon: FaReact, color: "#61DAFB" },
-      { name: "Tailwind CSS", icon: SiTailwindcss, color: "#38B2AC" },
-      { name: "Context API", icon: FaServer, color: "#6366F1" },
-      { name: "OpenWeather API", icon: FaDatabase, color: "#0064a5" },
+      { name: "Python", icon: SiPython, color: "#1338BE" },
+      { name: "Selenium Web Driver", icon: SiWebdriverio, color: "#fff" },
+    
     ],
-    liveLink: "#",
-    githubLink: "#",
-    image: "/img/projectimage.jfif", // Update with the actual project image
+    liveLink: "https://www.linkedin.com/posts/rudranarayan-sahu-b7b9a6244_ai-python-automation-activity-7293335824090157056-rpvY?utm_source=share&utm_medium=member_desktop&rcm=ACoAADyoxQ8BmIPWlJBebLnKbJlzJdfYeyoFJmE",
+    githubLink: "https://github.com/rudranarayan-01/LIMMY-0.1",
+    image: "/img/limmy.png", // Update with the actual project image
   },
 ];
+
 
 // Update your personal information
 export const personalInfo = {
