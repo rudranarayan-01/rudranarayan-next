@@ -42,9 +42,17 @@
 body {
   font-family: var(--font-sans);
   @apply antialiased;
+   overflow: scroll;
 }
 body {
   font-family: "Outfit", sans-serif;
+   user-select: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
+}
+
+body::-webkit-scrollbar {
+  display: none;
 }
 
 .navbar {
