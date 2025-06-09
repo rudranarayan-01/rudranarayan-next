@@ -177,7 +177,7 @@ export const projects = [
       "Enhances safety and prevents proxy attendance",
     ],
     techStack: [
-      { name: "Python", icon: SiPython, color: "#1338BE" },
+      { name: "Python", icon: SiPython, color: "#1338BE" }, 
       { name: "OpenCV", icon: SiOpencv, color: "#fff" },
     
     ],
