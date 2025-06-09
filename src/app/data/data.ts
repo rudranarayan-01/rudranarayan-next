@@ -162,13 +162,13 @@ export const projects = [
     techStack: [
       { name: "Python", icon: SiPython, color: "#1338BE" },
       { name: "Selenium Web Driver", icon: SiWebdriverio, color: "#fff" },
-    
+
     ],
     liveLink: "https://www.linkedin.com/posts/rudranarayan-sahu-b7b9a6244_ai-python-automation-activity-7293335824090157056-rpvY?utm_source=share&utm_medium=member_desktop&rcm=ACoAADyoxQ8BmIPWlJBebLnKbJlzJdfYeyoFJmE",
     githubLink: "https://github.com/rudranarayan-01/LIMMY-0.1",
     image: "/img/limmy.png", // Update with the actual project image
   },
-    {
+  {
     name: "Digital Attendance",
     description: "A Smart Facial Recognition for Seamless Attendance Tracking .",
     points: [
@@ -177,13 +177,31 @@ export const projects = [
       "Enhances safety and prevents proxy attendance",
     ],
     techStack: [
-      { name: "Python", icon: SiPython, color: "#1338BE" }, 
+      { name: "Python", icon: SiPython, color: "#1338BE" },
       { name: "OpenCV", icon: SiOpencv, color: "#fff" },
-    
+
     ],
     liveLink: "https://www.linkedin.com/posts/rudranarayan-sahu-b7b9a6244_hello-im-happy-to-share-face-recognition-activity-7292615518652379136--YnK?utm_source=share&utm_medium=member_desktop&rcm=ACoAADyoxQ8BmIPWlJBebLnKbJlzJdfYeyoFJmE",
     githubLink: "https://github.com/rudranarayan-01/Face-Recognition-Attendance-System",
     image: "/img/attendance.jpg", // Update with the actual project image
+  },
+  {
+    name: "Datapirates",
+    description: "A modern learning platform that allows users to explore, enroll in, and track progress across a variety of interactive courses.",
+    points: [
+      "Easy signup for diverse courses across domains",
+      "Visual dashboards to monitor learning milestones",
+      "Seamless experience across all devices",
+    ],
+    techStack: [
+      { name: "React.js", icon: FaReact, color: "#61DAFB" },
+      { name: "Framer Motion", icon: SiFramer, color: "#0055FF" },
+      { name: "NodeJS", icon: FaNodeJs, color: "#83CD29" },
+      { name: "ExpressJS", icon: SiExpress, color: "#C9D1D9" },
+    ],
+    liveLink: "https://datapirateslearning.netlify.app/",
+    githubLink: "https://github.com/rudranarayan-01/Datapirates",
+    image: "/img/datapirates.png", // Update with the actual project image
   },
 ];
 
