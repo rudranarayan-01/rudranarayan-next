@@ -4,7 +4,7 @@ import { BiLogoPython, BiLogoPostgresql, BiLogoFirebase } from "react-icons/bi";
 import { FiHome, FiMail } from "react-icons/fi";
 import { FaGithub, FaLinkedinIn } from "react-icons/fa";
 import { TbUserSquare } from "react-icons/tb";
-import { FaReact, FaNodeJs, FaDatabase, FaServer } from "react-icons/fa";
+import { FaReact, FaNodeJs } from "react-icons/fa";
 import { DiMysql } from "react-icons/di";
 import { TbBrandReactNative } from "react-icons/tb";
 import { RiNextjsLine } from "react-icons/ri";
@@ -14,7 +14,6 @@ import {
   SiTailwindcss,
   SiExpress,
   SiRedux,
-  SiSocketdotio,
   SiFirebase,
   SiMongodb,
 } from "react-icons/si";
@@ -27,7 +26,6 @@ import {
   SiTypescript,
   SiNextdotjs,
   SiFramer,
-  SiPostman,
   SiVercel,
 } from "react-icons/si";
 import { LuSquareCode } from "react-icons/lu";

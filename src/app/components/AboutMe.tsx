@@ -1,6 +1,5 @@
 "use client";
 import React from "react";
-import Experience from "./Experience";
 import Skills from "./Skills";
 import { motion } from "motion/react";
 import { fadeInRight, fadeInUp } from "../data/variants";

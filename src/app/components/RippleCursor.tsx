@@ -6,16 +6,17 @@ interface SnowflakeCursorOptions {
   element?: HTMLElement;
 }
 
+// ✅ Move this outside so it's not a dependency
+const possibleEmoji = ['❄️'];
+
 const SnowflakeCursor: React.FC<SnowflakeCursorOptions> = ({ element }) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
-  const particles = useRef<any[]>([]);
+  const particles = useRef<Particle[]>([]); // ✅ Fixed: specific type
   const canvImages = useRef<HTMLCanvasElement[]>([]);
   const animationFrame = useRef<number | null>(null);
-  const possibleEmoji = ['❄️'];
   const prefersReducedMotion = useRef<MediaQueryList | null>(null);
 
   useEffect(() => {
-    // Check if window is defined (to ensure code runs on client-side)
     if (typeof window === 'undefined') return;
 
     prefersReducedMotion.current = window.matchMedia(
@@ -142,9 +143,6 @@ const SnowflakeCursor: React.FC<SnowflakeCursorOptions> = ({ element }) => {
   return null;
 };
 
-/**
- * Particle Class
- */
 class Particle {
   position: { x: number; y: number };
   velocity: { x: number; y: number };
