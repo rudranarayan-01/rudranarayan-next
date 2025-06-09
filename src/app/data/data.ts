@@ -168,6 +168,23 @@ export const projects = [
     githubLink: "https://github.com/rudranarayan-01/LIMMY-0.1",
     image: "/img/limmy.png", // Update with the actual project image
   },
+    {
+    name: "Digital Attendance",
+    description: "A Smart Facial Recognition for Seamless Attendance Tracking .",
+    points: [
+      "AI-Powered Face Recognition with High accuracy",
+      "Real-time entry and exit time recording.",
+      "Enhances safety and prevents proxy attendance",
+    ],
+    techStack: [
+      { name: "Python", icon: SiPython, color: "#1338BE" },
+      { name: "OpenCV", icon: SiOpencv, color: "#fff" },
+    
+    ],
+    liveLink: "https://www.linkedin.com/posts/rudranarayan-sahu-b7b9a6244_hello-im-happy-to-share-face-recognition-activity-7292615518652379136--YnK?utm_source=share&utm_medium=member_desktop&rcm=ACoAADyoxQ8BmIPWlJBebLnKbJlzJdfYeyoFJmE",
+    githubLink: "https://github.com/rudranarayan-01/Face-Recognition-Attendance-System",
+    image: "/img/attendance.jpg", // Update with the actual project image
+  },
 ];
 
 
