@@ -8,6 +8,7 @@ import Hero from "./components/Hero";
 import Projects from "./components/Projects";
 import Achievements from "./components/Achievement";
 import Experience from "./components/Experience";
+import ServicesSection from "./components/Services";
 
 export default function Home() {
   const sectionRefs = {
@@ -25,6 +26,7 @@ export default function Home() {
       <Experience/>
       <Projects ref={sectionRefs.projects} />
       <Achievements/>
+      <ServicesSection/>
       <Contact ref={sectionRefs.contact} />
       <Footer />
     </>
