@@ -66,7 +66,7 @@ type NavbarItem = {
   name: string;
   type: "scroll" | "link";
   icon: React.ElementType;
-  size: string;
+  size: string;  
   url?: string;
 };
 export const navbarData: NavbarItem[] = [
@@ -118,7 +118,7 @@ export const projects = [
     points: [
       "Real-time traffic sign recognition and smart navigation.",
       "Obstacle avoidance with cruise control",
-      "Cloud-Connected Intelligence",
+      "Cloud-Connected Intelligence", 
     ],
     techStack: [
       { name: "Python", icon: SiPython, color: "#1338BE" },
