@@ -8,7 +8,7 @@ const tools = [
   {
     title: "AI Interview Prep",
     desc: "Mock interviews powered by AI to assess and improve.",
-    link: "https://ai-inter.netlify.app",
+    link: "https://ai-interview-01.vercel.app",
   },
   {
     title: "Resume & Cover letter Builder",
