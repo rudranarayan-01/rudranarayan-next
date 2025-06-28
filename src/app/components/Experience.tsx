@@ -32,7 +32,7 @@ export default function ExperienceSection() {
         JOURNEY THROUGH MY PROFESSIONAL GROWTH.
       </motion.h4>
       <motion.h2
-        variants={fadeInUp}
+        variants={fadeInUp} 
         initial="hidden"
         whileInView="visible"
         className="text-3xl animated-text-gradient md:text-5xl font-semibold pt-2 mb-6 md:mb-10 text-center text-neutral-100"

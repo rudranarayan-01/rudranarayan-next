@@ -27,7 +27,7 @@ export default function Home() {
       <Projects ref={sectionRefs.projects} />
       <Achievements/>
       <ServicesSection/>
-      <Contact ref={sectionRefs.contact} />
+      <Contact ref={sectionRefs.contact} /> 
       <Footer />
     </>
   );
