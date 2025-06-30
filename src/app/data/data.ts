@@ -206,7 +206,7 @@ export const projects = [
 ];
 
 
-// Update your personal information
+// Personal information
 export const personalInfo = {
   pfp: "/img/profile.png",
   alt: "Sample Profile Pic",
