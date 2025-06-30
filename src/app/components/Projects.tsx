@@ -40,7 +40,7 @@ const Projects = React.forwardRef<HTMLElement, unknown>((props, ref) => {
         whileInView="visible"
         className="text-3xl animated-text-gradient md:text-5xl font-semibold pt-2 pb-1 mb-6 md:mb-10 text-neutral-100"
       >
-        Projects
+        Projectprojects
       </motion.h2>
 
       <motion.div
