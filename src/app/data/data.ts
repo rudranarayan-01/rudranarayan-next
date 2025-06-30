@@ -118,7 +118,7 @@ export const projects = [
     points: [
       "Real-time traffic sign recognition and smart navigation.",
       "Obstacle avoidance with cruise control",
-      "Cloud-Connected Intelligence", 
+      "Cloud-Connected Intelligence",  
     ],
     techStack: [
       { name: "Python", icon: SiPython, color: "#1338BE" },
