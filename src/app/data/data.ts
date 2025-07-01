@@ -147,7 +147,7 @@ export const projects = [
       { name: "Tailwind CSS", icon: SiTailwindcss, color: "#38B2AC" },
       { name: "Firebase", icon: SiFirebase, color: "#FFCA28" },
     ],
-    liveLink: "https://ai-inter.netlify.app/",
+    liveLink: "https://ai-interview-01.vercel.app",
     githubLink: "https://github.com/rudranarayan-01/AI-Interview",
     image: "/img/ai-inter.png", // Update with the actual project image
   },
