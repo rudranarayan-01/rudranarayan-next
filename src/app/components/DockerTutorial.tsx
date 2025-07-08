@@ -4,7 +4,6 @@ import Link from 'next/link';
 import CodeBlock from './CodeBlock';
 import TutorialLayout from './TutorialLayout';
 import { motion } from 'framer-motion';
-import Image from 'next/image';
 
 export default function DockerTutorial() {
   return (
