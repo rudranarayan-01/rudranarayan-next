@@ -1,10 +1,12 @@
-export const headerVariants = {
+// These variants are now fully valid in TypeScript with Framer Motion
+
+export const headerVariants = { 
   initial: { y: -5, opacity: 0, rotateY: 45 },
   whileInView: {
     y: 0,
     opacity: 1,
     rotateY: 0,
-    transition: { duration: 0.5, ease: "easeOut" },
+    transition: { duration: 0.5, ease: [0.42, 0, 1, 1] },
   },
   whileHover: {
     scaleX: 1.01,
@@ -31,23 +33,23 @@ export const fadeInRight = {
   whileInView: {
     clipPath: "inset(0% 0% 0% 0%)",
     opacity: 1,
-    transition: { duration: 0.6, ease: "easeOut" },
+    transition: { duration: 0.6, ease: [0.42, 0, 1, 1] },
   },
 };
 
 export const fadeInUp = {
   hidden: { opacity: 0, y: 20 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" } },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: [0.42, 0, 1, 1] } },
 };
 
 export const fadeInDown = {
   hidden: { opacity: 0, y: -20 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" } },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: [0.42, 0, 1, 1] } },
 };
 
 export const fadeInUpLarge = {
   hidden: { opacity: 0, y: 30 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" } },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: [0.42, 0, 1, 1] } },
 };
 
 export const fadeInUpRight = {
@@ -56,7 +58,7 @@ export const fadeInUpRight = {
     opacity: 1,
     y: 0,
     x: 0,
-    transition: { duration: 0.5, ease: "easeOut" },
+    transition: { duration: 0.5, ease: [0.42, 0, 1, 1] },
   },
 };
 
@@ -66,7 +68,7 @@ export const fadeInUpLeft = {
     opacity: 1,
     y: 0,
     x: 0,
-    transition: { duration: 0.5, ease: "easeOut" },
+    transition: { duration: 0.5, ease: [0.42, 0, 1, 1] },
   },
 };
 
@@ -75,7 +77,7 @@ export const fadeInUpDelay = {
   visible: {
     opacity: 1,
     y: 0,
-    transition: { duration: 0.3, ease: "easeOut", delay: 0.2 },
+    transition: { duration: 0.3, ease: [0.42, 0, 1, 1], delay: 0.2 },
   },
 };
 
@@ -84,6 +86,6 @@ export const rotateYVariant = {
   whileInView: {
     opacity: 1,
     rotateY: 0,
-    transition: { duration: 0.6, ease: "easeOut", delay: 0.4 },
+    transition: { duration: 0.6, ease: [0.42, 0, 1, 1], delay: 0.4 },
   },
 };

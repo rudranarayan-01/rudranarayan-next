@@ -10,6 +10,7 @@ import { TbBrandReactNative } from "react-icons/tb";
 import { RiNextjsLine } from "react-icons/ri";
 import { SiPython, SiShadcnui } from "react-icons/si";
 import { SiWebdriverio } from "react-icons/si";
+import { FaDocker } from "react-icons/fa";
 import {
   SiTailwindcss,
   SiExpress,
@@ -60,6 +61,7 @@ export const skills = [
   { name: "Mysql ", icon: DiMysql, color: "#F29111 " },
   { name: "Postgresql ", icon: BiLogoPostgresql, color: "#336791" },
   { name: "Firebase", icon: BiLogoFirebase, color: "#ffa611" },
+  { name: "Docker", icon: FaDocker, color: "#3178C6" },
 ];
 
 type NavbarItem = {
