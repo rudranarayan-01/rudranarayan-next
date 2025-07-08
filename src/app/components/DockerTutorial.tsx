@@ -20,11 +20,9 @@ export default function DockerTutorial() {
           transition={{ delay: 0.2 }}
         >
           <h1 className="text-4xl font-bold text-white mb-2">🚀 Docker Tutorial</h1>
-          <p className="text-gray-300 text-lg">
-            <li>Docker is a open source platform</li>
-            <li>Use for building, running, managing applications by packing them into a standardize unit called container</li>
-            <li>Docker has two components docker container and docker images</li>
-          </p>
+            <li className='text-gray-300 text-lg'>Docker is a open source platform</li>
+            <li className='text-gray-300 text-lg'>Use for building, running, managing applications by packing them into a standardize unit called container</li>
+            <li className='text-gray-300 text-lg'>Docker has two components docker container and docker images</li>
         </motion.div>
 
         <motion.div

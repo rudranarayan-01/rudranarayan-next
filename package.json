@@ -13,7 +13,6 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "framer-motion": "^12.23.0",
-    "highlight.js": "^11.11.1",
     "lucide-react": "^0.513.0",
     "motion": "^12.4.10",
     "next": "^15.3.3",
@@ -21,9 +20,7 @@
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-icons": "^5.5.0",
-    "react-markdown": "^10.1.0",
     "react-parallax-tilt": "^1.7.297",
-    "remark-gfm": "^4.0.1",
     "tailwind-merge": "^3.3.0"
   },
   "devDependencies": {
