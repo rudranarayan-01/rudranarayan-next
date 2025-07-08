@@ -89,7 +89,7 @@ docker -v`} />
  docker run -it ubuntu`} />
 
             <p className='text-gray-300 text-lg'>Now we are inside ubuntu container </p>
-            <Image src= />
+            
           </div>
         </motion.div>
 
