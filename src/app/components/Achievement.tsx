@@ -33,7 +33,7 @@ export default function Achievements() {
 
     const observer = new IntersectionObserver(
       (entries) => {
-        entries.forEach((entry, i) => {
+        entries.forEach((entry) => {
           if (entry.isIntersecting) {
             entry.target.classList.add("fade-in-up");
             observer.unobserve(entry.target);

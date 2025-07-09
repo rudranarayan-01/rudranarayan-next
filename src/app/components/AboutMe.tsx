@@ -8,7 +8,6 @@ import PersonalInfo from "./PersonalInfo";
 const AboutMe = forwardRef<HTMLElement>((_, ref) => {
   const h4Ref = useRef<HTMLHeadingElement>(null);
   const h2Ref = useRef<HTMLHeadingElement>(null);
-  const sectionRef = useRef<HTMLElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {

@@ -1,11 +1,11 @@
 import React from "react";
 import { skills } from "../data/data";
 import { motion } from "motion/react";
-import { fadeInUpLeft, rotateYVariant } from "../data/variants";
+import { fadeInUp, rotateYVariant } from "../data/variants";
 const Skills = () => {
   return (
     <motion.section
-      variants={fadeInUpLeft}
+      variants={fadeInUp}
       initial="hidden"
       whileInView="visible"
       className="bg-neutral-950 flex flex-col justify-center text-neutral-100 "

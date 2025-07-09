@@ -1,4 +1,4 @@
-import { Easing, easeOut } from "framer-motion"; // ✅ import easing
+import { easeOut } from "framer-motion"; // ✅ import easing
 
 export const headerVariants = {
   initial: { y: -5, opacity: 0, rotateY: 45 },
@@ -83,9 +83,11 @@ export const fadeInUpDelay = {
 
 export const rotateYVariant = {
   initial: { opacity: 0, rotateY: 45 },
-  animate: {
+  whileInView: {
     opacity: 1,
     rotateY: 0,
     transition: { duration: 0.6, ease: easeOut, delay: 0.4 },
   },
 };
+
+
