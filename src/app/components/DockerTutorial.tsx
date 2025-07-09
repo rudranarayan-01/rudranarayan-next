@@ -107,19 +107,19 @@ docker -v`} />
     docker run -it ubuntu`} />
                     <Image src="/img/Docker/image.png" alt='img' height={500} width={1000} />
 
-                    <p className='text-gray-300 text-lg'>Let's try some ubuntum commands</p>
+                    <p className='text-gray-300 text-lg'>Try some ubuntum commands</p>
                     <CodeBlock code={`ls`} />
                     <Image src="/img/Docker/image-1.png" alt='img' height={500} width={1000} />
 
-                    <p className='text-gray-300 text-lg'>Let's create a directory inside ubuntu container</p>
+                    <p className='text-gray-300 text-lg'>Create a directory inside ubuntu container</p>
                     <CodeBlock code={`mkdir DIR1`} />
                     <Image src="/img/Docker/image-2.png" alt='img' height={500} width={1000} />
 
-                    <p className='text-gray-300 text-lg'>Let's print different environment variables availbale inside ubuntu container</p>
+                    <p className='text-gray-300 text-lg'>Print different environment variables availbale inside ubuntu container</p>
                     <CodeBlock code={`env`} />
                     <Image src="/img/Docker/image-3.png" alt='img' height={500} width={1000} />
 
-                    <p className='text-gray-300 text-lg'>Let's exit from the container</p>
+                    <p className='text-gray-300 text-lg'>Exit from the container</p>
                     <CodeBlock code={`exit`} />
                     <p className='text-gray-300 text-lg'>After the execution of exit command our container will stop running and back to system CLI</p>
 
