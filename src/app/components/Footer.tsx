@@ -1,5 +1,4 @@
 import { motion } from "motion/react";
-import { fadeInRight, fadeInUp } from "../data/variants";
 
 const Footer = () => {
   return (

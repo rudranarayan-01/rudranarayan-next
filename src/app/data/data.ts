@@ -33,6 +33,7 @@ import { LuSquareCode } from "react-icons/lu";
 import { IoLogoGithub } from "react-icons/io";
 import { SiScikitlearn, SiPytorch, SiOpencv, SiTensorflow, SiPandas, SiFlask, SiDjango, SiExpo } from "react-icons/si";
 
+import React from 'react';
 // List your technical skills below
 export const skills = [
   { name: "Python", icon: BiLogoPython, color: "#1338BE" },

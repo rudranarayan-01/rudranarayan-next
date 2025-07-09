@@ -5,7 +5,7 @@ import Image from "next/image";
 import { motion } from "motion/react";
 import { FiExternalLink } from "react-icons/fi";
 import { FaGithub } from "react-icons/fa";
-import { fadeInRight, fadeInUp, fadeInUpDelay, fadeInUpLarge } from "../data/variants";
+import { fadeInUp, fadeInUpDelay, fadeInUpLarge } from "../data/variants";
 
 const Projects = React.forwardRef<HTMLElement, unknown>((props, ref) => {
   const [isLargeScreen, setIsLargeScreen] = useState(false);

@@ -32,7 +32,7 @@ export default function DockerTutorial() {
                 >
                     <h2 className="text-2xl font-semibold text-white border-b border-gray-700 pb-1">🧪 Installation</h2>
                     <p className="text-gray-300">
-                        Install Docker and verify it's working using the following commands:
+                        Install Docker and verify using following commands
                     </p>
                     <CodeBlock code={`docker
 docker -v`} />
