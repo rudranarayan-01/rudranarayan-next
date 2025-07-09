@@ -2,7 +2,7 @@
 // Place all images in the "img" folder inside the "public" directory and reference them using the path: "/img/FILE_NAME".
 import { BiLogoPython, BiLogoPostgresql, BiLogoFirebase } from "react-icons/bi";
 import { FiHome, FiMail } from "react-icons/fi";
-import { FaGithub, FaLinkedinIn } from "react-icons/fa";
+import { FaBlog, FaGithub, FaLinkedinIn } from "react-icons/fa";
 import { TbUserSquare } from "react-icons/tb";
 import { FaReact, FaNodeJs } from "react-icons/fa";
 import { DiMysql } from "react-icons/di";
@@ -69,7 +69,7 @@ type NavbarItem = {
   name: string;
   type: "scroll" | "link";
   icon: React.ElementType;
-  size: string;  
+  size: string;
   url?: string;
 };
 export const navbarData: NavbarItem[] = [
@@ -77,18 +77,12 @@ export const navbarData: NavbarItem[] = [
   { name: "About", type: "scroll", icon: TbUserSquare, size: "18px" },
   { name: "Projects", type: "scroll", icon: LuSquareCode, size: "18px" },
   { name: "Contact", type: "scroll", icon: FiMail, size: "18px" },
+  { name: "Blog", type: "link", icon: FaBlog, size: "18px", url: "/blog" },
   {
     name: "LinkedIn",
     type: "link",
     icon: FaLinkedinIn,
     url: "https://www.linkedin.com/in/rudranarayan-sahu-b7b9a6244/", // Replace "#" with your LinkedIn profile URL.
-    size: "18px",
-  },
-  {
-    name: "Github",
-    type: "link",
-    icon: IoLogoGithub,
-    url: "https://github.com/rudranarayan-01", // Replace "#" with your Github profile URL.
     size: "18px",
   },
 ];
@@ -121,7 +115,7 @@ export const projects = [
     points: [
       "Real-time traffic sign recognition and smart navigation.",
       "Obstacle avoidance with cruise control",
-      "Cloud-Connected Intelligence",  
+      "Cloud-Connected Intelligence",
     ],
     techStack: [
       { name: "Python", icon: SiPython, color: "#1338BE" },
