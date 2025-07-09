@@ -10,3 +10,4 @@ This is my personal portfolio website built with **Next.js 15**, **Tailwind CSS*
 - TypeScript
 
 Live link: https://rudranarayan.vercel.app/
+ 
