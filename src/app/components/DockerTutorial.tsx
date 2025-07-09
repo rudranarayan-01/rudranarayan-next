@@ -4,6 +4,7 @@ import Link from 'next/link';
 import CodeBlock from './CodeBlock';
 import TutorialLayout from './TutorialLayout';
 import { motion } from 'framer-motion';
+import Image from 'next/image';
 
 export default function DockerTutorial() {
     return (
@@ -27,7 +28,7 @@ export default function DockerTutorial() {
                         Using for building, running, managing applications by packing them into a standardize unit called container.
                     </li>
                     <li className="text-gray-300 text-lg">
-                        Docker has two components docker container and docker images. 
+                        Docker has two components docker container and docker images.
                     </li>
                 </motion.div>
 
@@ -104,6 +105,42 @@ docker -v`} />
                     <li className='text-gray-300 text-lg'>Now we are inside ubuntu container</li>
                     <CodeBlock code={`    docker pull ubuntu
     docker run -it ubuntu`} />
+                    <Image src="/img/Docker/image.png" alt='img' height={500} width={1000} />
+
+                    <p className='text-gray-300 text-lg'>Let's try some ubuntum commands</p>
+                    <CodeBlock code={`ls`} />
+                    <Image src="/img/Docker/image-1.png" alt='img' height={500} width={1000} />
+
+                    <p className='text-gray-300 text-lg'>Let's create a directory inside ubuntu container</p>
+                    <CodeBlock code={`mkdir DIR1`} />
+                    <Image src="/img/Docker/image-2.png" alt='img' height={500} width={1000} />
+
+                    <p className='text-gray-300 text-lg'>Let's print different environment variables availbale inside ubuntu container</p>
+                    <CodeBlock code={`env`} />
+                    <Image src="/img/Docker/image-3.png" alt='img' height={500} width={1000} />
+
+                    <p className='text-gray-300 text-lg'>Let's exit from the container</p>
+                    <CodeBlock code={`exit`} />
+                    <p className='text-gray-300 text-lg'>After the execution of exit command our container will stop running and back to system CLI</p>
+
+                    <li className='text-gray-300 text-lg'>docker ps - To check all the running container (ps - process status)</li>
+                    <CodeBlock code={`docker ps`} />
+                    <p>To check all the available container</p>
+                    <CodeBlock code={`docker ps -a`} />
+
+                    <li className='text-gray-300 text-lg'>docker start CONT_NAME or CONT_ID</li>
+                    <li className='text-gray-300 text-lg'>docker stop CONT_NAME or CONT_ID</li>
+                    <p className='text-gray-300 text-lg'>These two comands are used to start or stop the container</p>
+                    <p className='text-gray-300 text-lg'>Starting the container with container Id</p>
+                    <CodeBlock code={`docker start e73ecd583380`} />
+                    <p className='text-gray-300 text-lg'>Stoppng the container with name</p>
+                    <CodeBlock code={`docker stop gallant_lovelace`} />
+                    
+                    <li className='text-gray-300 text-lg'>docker rmi IMAGE_NAME</li>
+                    <p className='text-gray-300 text-lg'>This command is used to remove or destroy image</p>
+                    <p className='text-gray-300 text-lg'>NB: To delete the image we need to destroy the container first</p>
+                    <li>docker rm CONT_ID Used to remove container</li>
+                    <Image src="/img/Docker/image-4.png" alt='img' height={500} width={1000} />
 
                 </motion.div>
             </motion.div>
