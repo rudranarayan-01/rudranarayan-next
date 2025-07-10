@@ -376,11 +376,11 @@ docker -v`} />
                         <li className='text-gray-300 text-lg'>Mounted to container paths: Data written to the mounted directory in the container goes to the volume.</li>
                         <li className='text-gray-300 text-lg'>Data sharing: Multiple containers can access and modify the same volume.</li>
                         <li className='text-gray-300 text-lg'>Easy backup and restore: Volumes simplify data backup and recovery processes.</li>
-                        <li className='text-gray-300 text-lg'>Named vs. Anonymous: Named volumes are user-defined and recommended, while anonymous volumes are automatically created and tied to the container's lifecycle.</li>
+                        <li className='text-gray-300 text-lg'>Named vs. Anonymous: Named volumes are user-defined and recommended, while anonymous volumes are automatically created and tied to the container lifecycle.</li>
                         <li className='text-gray-300 text-lg'>Volume drivers: Allow storing volumes on remote hosts or cloud providers.</li>
                         <p className='text-gray-300 text-lg'>We use -v tag for defining volume.</p>
                         <CodeBlock code={`docker run -it -v /Users/RUDRANARAYAN/Desktop/data:/test/data ubuntu `} />
-                        <p className='text-gray-300 text-lg'>Here u I'm giving the path where docker container will be store, and RUDRANARAYAN is my device name or hostname.</p>
+                        <p className='text-gray-300 text-lg'>Here u I am giving the path where docker container will be store, and RUDRANARAYAN is my device name or hostname.</p>
                         <p className='text-gray-300 text-lg'>Here we are mapping a local directory to a container directory</p>
                         <Image src="/img/Docker/image-27.png" alt='img' height={500} width={1000} />
                         <p className='text-gray-300 text-lg'>Now go to inside data folder  cd data, and then create two new file  touch index.html and touch server.js.</p>
