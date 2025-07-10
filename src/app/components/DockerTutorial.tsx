@@ -226,6 +226,126 @@ docker -v`} />
 
                     </motion.div>
 
+                    <motion.div
+                        initial={{ opacity: 0, x: 20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: 0.3 }}
+                        className="space-y-4"
+                    >
+                        <h2 className="text-2xl font-semibold text-white border-b border-gray-700 pb-1">Docker Network</h2>
+                        <p className="text-gray-300 text-lg">Docker has the ability to create isolated network which allows Docker containers to communicate with each other and with the outside world.</p>
+                        <CodeBlock code={`docker network create NETWORK_NAME`} />
+                        <p className='text-gray-300 text-lg'>To check available network in our system</p>
+                        <CodeBlock code={`docker network ls`} />
+
+                        <h2 className='text-lg text-gray-300'>Developing with Docker</h2>
+                        <li className='text-lg text-gray-300'>Creating a network</li>
+                        <CodeBlock code={`docker network create mongo_network`} />
+                        <li className='text-lg text-gray-300'>Setting up mongo and mongo-express</li>
+                        <CodeBlock code={`docker run -d -p27017:27017 --name mongo --network mongo-network -e MONGO_INITDB_ROOT_USERNAME=admin -e MONGO_INITDB_ROOT_PASSWORD=qwerty mongo`} />
+                        <Image src="/img/Docker/Screenshot 2025-07-05 184643.png" alt='img' height={500} width={1000} />
+                        <p className='text-lg text-gray-300'>Mongo is pulled sucessfully and connected to port number 27017, with username admin and password qwerty
+                            Now its time to pull mongo-express with the same network</p>
+                        <CodeBlock code={`    docker run -d -p8081:8081 --name mongo-express --network mongo-network -e ME_CONFIG_MONGODB_ADMINUSERNAME=admin -e ME_CONFIG_MONGODB_ADMINPASSWORD=qwerty -e ME_CONFIG_MONGODB_URL="mongodb://admin:qwerty@mongo:27017" mongo-express`} />
+                        <Image src={"/img/Docker/image-12.png"} alt='img' height={500} width={1000} />
+                        <li className='text-gray-300 text-lg'>Now go to localhost:8081</li>
+                        <p className='text-gray-300 text-lg'>username - admin <br />password - pass</p>
+                        <Image src={"/img/Docker/image-13.png"} alt='img' height={500} width={1000} />
+                        <p className='text-gray-300 text-lg'>Now we can see the mongo-express dashboard</p>
+
+                        <p className='text-gray-300 text-lg'>Now we have a node js test application we run this</p>
+                        <CodeBlock code={`node server.js`} />
+
+                        <p className='text-gray-300 text-lg'>Goto localhost:5050 and fill the details and refresh the mongo-express dashboard we have a user list</p>
+                        <Image src={"/img/Docker/image-14.png"} alt='img' height={500} width={1000} />
+                        <p className='text-lg text-gray-300'>Now we are sucessfully connected with docker container.</p>
+                    </motion.div>
+
+                    <motion.div
+                        initial={{ opacity: 0, x: 20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: 0.3 }}
+                        className="space-y-4"
+                    >
+                        <h2 className="text-2xl font-semibold text-white border-b border-gray-700 pb-1">Docker Compose</h2>
+                        <p className="text-gray-300 text-lg">Docker compose is a tool for defining and running multicontainer application. This will be done with the help of a .yaml file.</p>
+                        <p className='text-gray-300 text-lg'>yaml - yet another markup language</p>
+                        <p className='text-gray-300 text-lg'>Advantages : - Standardize way of commands - Easy to edit and modify</p>
+                        <p className='text-gray-300 text-lg'>Indentation is most require in yaml file</p>
+                        <Image src="/img/Docker/e.png" alt='img' height={500} width={1000} />
+                        <CodeBlock code={`docker compose -f fileName.yaml ip -d`} />
+                        <p className='text-gray-300 text-lg mb-10'>This up command is used when we want to create container in dettach mode.</p>
+                        <CodeBlock code={`docker compose -f fileName.yaml down`} />
+                        <p className='text-gray-300 text-lg mb-10'>This command is used to stop the container and remove the container</p>
+                        <p className='text-gray-200 text-2xl'>Now we run this yaml file by following these instructions.</p>
+                        <p className='text-gray-300 text-lg'>1. It is necessary to check wheather the container already exists , if yes then delete it before running the yaml file.</p>
+                        <p className='text-lg text-gray-300'>2. Then run the compose command to create container</p>
+                        <CodeBlock code={`docker compose -f mongodb.yaml up -d`} />
+                        <Image src="/img/Docker/a.png" alt='img' height={500} width={1000} />
+                        <p className='text-gray-300 text-lg'>Now we can see that two container are running on the spesified port</p>
+                        <Image src="/img/Docker/b.png" alt='img' height={500} width={1000} />
+                        <p className='text-gray-300 text-lg'>3. Now we can test is the container running or not by going to the localhost:8081 port. Simillarly username will be admin and password will be pass.</p>
+                        <Image src="/img/Docker/c.png" alt='img' height={500} width={1000} />
+                        <p className='text-gray-300 text-lg'>We can see here there is no database with name datapirates(we created before). It's because when we restart our container it became reset. So we create the user in same way as before</p>
+                        <p className="text-lg text-gray-300">4. Go to localhost:5050 and get the doccument</p>
+                        <Image src="/img/Docker/d.png" alt='img' height={500} width={1000} />
+                        <p className='text-gray-300 text-lg'>5. If we want to remove the container with network.</p>
+                        <CodeBlock code={`docker compose -f mongodb.yaml down`} />
+                        <p className='text-gray-300 text-lg'>This will remove all the container with network.</p>
+                    </motion.div>
+
+                    <motion.div
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: 0.4 }}
+                        className="space-y-4"
+                    >
+                        <h2 className="text-2xl font-semibold text-white border-b border-gray-700 pb-1">Dockerizing our App</h2>
+                        <p className='text-lg text-gray-300'>Converting our ap to docker image then docker container.</p>
+                        <p className='text-lg text-gray-500'>test app ---- docker image --- docker container</p>
+                        <p className='text-lg text-gray-300'>A Dockerfile is a plain text file containing a set of instructions used to build a Docker image.</p>
+                        <p className='text-lg text-gray-300'>For mode you can follow <Link className='text-blue-500' href="https://spacelift.io/blog/dockerfile">https://spacelift.io/blog/dockerfile</Link></p>
+                        <p className='text-2xl text-blue-300'>Important instruction of dockerfile</p>
+                        <li className='text-lg text-gray-300'>FROM Specifies the base image for the Docker image being built. It acts as the foundation upon which the rest of the image is built.</li>
+                        <CodeBlock code={`FROM <base_image>`}/>
+                        <li className='text-lg text-gray-300'>WORKDIR Sets the working directory inside the container for subsequent instructions like RUN, COPY, CMD, etc.</li>
+                        <CodeBlock code={`WORKDIR <path>`}/>
+                        <li className='text-lg text-gray-300'>COPY Copies files and directories from the build context (your local machine) into the image.</li>
+                        <CodeBlock code={`COPY <src> <dest>`}/>
+                        <li className='text-lg text-gray-300'>RUN Executes shell commands during the image build process. These commands are run in new layers, and the results are committed to the image.</li>
+                        <CodeBlock code={`RUN <command>`}/>
+                        <li className='text-lg text-gray-300'>CMD Provides default instructions for running a container based on the image. It defines the command that will be executed when a container starts without any specific command-line arguments.</li>
+                        <CodeBlock code={`CMD <command>`}/>
+                        <li className='text-lg text-gray-300'>EXPOSE Informs Docker that the container listens on the specified network port at runtime. It's a form of documentation rather than a publishing mechanism.</li>
+                        <CodeBlock code={`EXPOSE <port>`}/>
+                        <li className='text-lg text-gray-300'>ENV Sets environment variables that can be used within the container.</li>
+                        <CodeBlock code={`ENV <name> <value>`}/>
+                        <Image src="/img/Docker/image-15.png" alt='img' height={500} width={1000} />
+                        <p className='text-lg text-gray-300'>Now we have a dockerfile, now we build the image using the following command</p>
+                        <Image src="/img/Docker/image-17.png" alt='img' height={500} width={1000} />
+                        <CodeBlock code={`docker build -t testapp:1.0 .`} />
+                        <Image src="/img/Docker/image-18.png" alt='img' height={500} width={1000} />
+                        <p className='text-gray-300 text-lg'>Now we can check the available images by typing docker images in terminal</p>
+                        <p className='text-gray-300 text-lg'>Now we can create a container from docker image</p>
+                        <CodeBlock code={`docker run testapp:1.0`} />
+                        <Image src="/img/Docker/image-19.png" alt='img' height={500} width={1000} />
+                        <p className='text-gray-300 text-lg'>Also we can run our container in interractive mode</p>
+
+                    </motion.div>
+
+                    <motion.div
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: 0.4 }}
+                        className="space-y-4"
+                    >
+                        <h2 className="text-2xl font-semibold text-white border-b border-gray-700 pb-1">Docker Volumes</h2>
+                        <p className='text-lg text-gray-300'>Converting our ap to docker image then docker container.</p>
+                        <p className='text-lg text-gray-300'>A Dockerfile is a plain text file containing a set of instructions used to build a Docker image.</p>
+                        <p className='text-lg text-gray-300'>For mode you can follow <Link className='text-blue-500' href="https://spacelift.io/blog/dockerfile">https://spacelift.io/blog/dockerfile</Link></p>
+
+                    </motion.div>
+
                 </motion.div>
             </motion.div>
         </TutorialLayout>
