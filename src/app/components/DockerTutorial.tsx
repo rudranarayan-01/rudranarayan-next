@@ -286,7 +286,7 @@ docker -v`} />
                         <Image src="/img/Docker/b.png" alt='img' height={500} width={1000} />
                         <p className='text-gray-300 text-lg'>3. Now we can test is the container running or not by going to the localhost:8081 port. Simillarly username will be admin and password will be pass.</p>
                         <Image src="/img/Docker/c.png" alt='img' height={500} width={1000} />
-                        <p className='text-gray-300 text-lg'>We can see here there is no database with name datapirates(we created before). It's because when we restart our container it became reset. So we create the user in same way as before</p>
+                        <p className='text-gray-300 text-lg'>We can see here there is no database with name datapirates(we created before). It is because when we restart our container it became reset. So we create the user in same way as before</p>
                         <p className="text-lg text-gray-300">4. Go to localhost:5050 and get the doccument</p>
                         <Image src="/img/Docker/d.png" alt='img' height={500} width={1000} />
                         <p className='text-gray-300 text-lg'>5. If we want to remove the container with network.</p>
@@ -307,19 +307,19 @@ docker -v`} />
                         <p className='text-lg text-gray-300'>For mode you can follow <Link className='text-blue-500' href="https://spacelift.io/blog/dockerfile">https://spacelift.io/blog/dockerfile</Link></p>
                         <p className='text-2xl text-blue-300'>Important instruction of dockerfile</p>
                         <li className='text-lg text-gray-300'>FROM Specifies the base image for the Docker image being built. It acts as the foundation upon which the rest of the image is built.</li>
-                        <CodeBlock code={`FROM <base_image>`}/>
+                        <CodeBlock code={`FROM <base_image>`} />
                         <li className='text-lg text-gray-300'>WORKDIR Sets the working directory inside the container for subsequent instructions like RUN, COPY, CMD, etc.</li>
-                        <CodeBlock code={`WORKDIR <path>`}/>
+                        <CodeBlock code={`WORKDIR <path>`} />
                         <li className='text-lg text-gray-300'>COPY Copies files and directories from the build context (your local machine) into the image.</li>
-                        <CodeBlock code={`COPY <src> <dest>`}/>
+                        <CodeBlock code={`COPY <src> <dest>`} />
                         <li className='text-lg text-gray-300'>RUN Executes shell commands during the image build process. These commands are run in new layers, and the results are committed to the image.</li>
-                        <CodeBlock code={`RUN <command>`}/>
+                        <CodeBlock code={`RUN <command>`} />
                         <li className='text-lg text-gray-300'>CMD Provides default instructions for running a container based on the image. It defines the command that will be executed when a container starts without any specific command-line arguments.</li>
-                        <CodeBlock code={`CMD <command>`}/>
-                        <li className='text-lg text-gray-300'>EXPOSE Informs Docker that the container listens on the specified network port at runtime. It's a form of documentation rather than a publishing mechanism.</li>
-                        <CodeBlock code={`EXPOSE <port>`}/>
+                        <CodeBlock code={`CMD <command>`} />
+                        <li className='text-lg text-gray-300'>EXPOSE Informs Docker that the container listens on the specified network port at runtime. It is a form of documentation rather than a publishing mechanism.</li>
+                        <CodeBlock code={`EXPOSE <port>`} />
                         <li className='text-lg text-gray-300'>ENV Sets environment variables that can be used within the container.</li>
-                        <CodeBlock code={`ENV <name> <value>`}/>
+                        <CodeBlock code={`ENV <name> <value>`} />
                         <Image src="/img/Docker/image-15.png" alt='img' height={500} width={1000} />
                         <p className='text-lg text-gray-300'>Now we have a dockerfile, now we build the image using the following command</p>
                         <Image src="/img/Docker/image-17.png" alt='img' height={500} width={1000} />
@@ -330,6 +330,12 @@ docker -v`} />
                         <CodeBlock code={`docker run testapp:1.0`} />
                         <Image src="/img/Docker/image-19.png" alt='img' height={500} width={1000} />
                         <p className='text-gray-300 text-lg'>Also we can run our container in interractive mode</p>
+                        <CodeBlock code={`docker run -it testapp:1.0 bash`} />
+                        <p className='text-gray-300 text-lg'>Now we can see that all the files are available inside our containeer.</p>
+                        <Image src="/img/Docker/image-20.png" alt='img' height={500} width={1000} />
+                        <p className='text-gray-300 text-lg'>Now we can see that we have node_modules folder inside our container which we dont want. If we want to skip this folder during image building then we can just write RUN npm install inside the Dockerfile.</p>
+                        <Image src="/img/Docker/image-21.png" alt='img' height={500} width={1000} />
+                        <p className='text-gray-300 text-lg'>Now exit from the interractive terminal of container by typing exit inside it and enter. Now we have three docker images(we can als check by typing docker images inside the terminal). To run this three terminals simultaneously we can use the compose.</p>
 
                     </motion.div>
 
@@ -339,11 +345,68 @@ docker -v`} />
                         transition={{ delay: 0.4 }}
                         className="space-y-4"
                     >
+                        <h2 className="text-2xl font-semibold text-white border-b border-gray-700 pb-1">Publishing Images in Dockerhub</h2>
+                        <p className='text-lg text-gray-300'>1. Go to docker hub <Link className='text-blue-500' href=" https://hub.docker.com/"> https://hub.docker.com/</Link> and authenticate</p>
+                        <p className='text-lg text-gray-300'>2. Go to My Profile --- My hub -- repository</p>
+                        <p className='text-lg text-gray-300'>3. Create a repo and copy the name (may be public or private)</p>
+                        <Image src="/img/Docker/image-22.png" alt='img' height={500} width={1000} />
+                        <p className='text-lg text-gray-300'>4. build with that repo</p>
+                        <CodeBlock code={`docker build -t rudranarayan01/testapp .`} />
+                        <Image src="/img/Docker/image-23.png" alt='img' height={500} width={1000} />
+                        <p className='text-gray-300 text-lg'>Now there is a new image in docker desktop wit name rudranarayan01/testapp</p>
+                        <p className='text-gray-300 text-lg'>5. Now docker login in terminal with docker hub credentials (we are first logged in using doker desktop credentials so logout by entering docker logout)</p>
+                        <CodeBlock code={`docker login`} />
+                        <Image src="/img/Docker/image-25.png" alt='img' height={500} width={1000} />
+                        <p className='text-gray-300 text-lg'>Here logged in using one time code(device verfication)</p>
+                        <Image src="/img/Docker/image-24.png" alt='img' height={500} width={1000} />
+                        <p className='text-gray-300 text-lg'>6. Now we can push our image to docker hub</p>
+                        <CodeBlock code={`docker push rudranarayan01/testapp:latest`} />
+                        <Image src="/img/Docker/image-26.png" alt='img' height={500} width={1000} />
+                    </motion.div>
+                    <motion.div
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: 0.4 }}
+                        className="space-y-4"
+                    >
                         <h2 className="text-2xl font-semibold text-white border-b border-gray-700 pb-1">Docker Volumes</h2>
-                        <p className='text-lg text-gray-300'>Converting our ap to docker image then docker container.</p>
-                        <p className='text-lg text-gray-300'>A Dockerfile is a plain text file containing a set of instructions used to build a Docker image.</p>
-                        <p className='text-lg text-gray-300'>For mode you can follow <Link className='text-blue-500' href="https://spacelift.io/blog/dockerfile">https://spacelift.io/blog/dockerfile</Link></p>
-
+                        <p className='text-lg text-gray-300'>Volumes are persistent data stores for containers. Containers stores data in virtual mode like if we restart the docker desktop all the data all the container will be reset. We can map multiple container in a single volume.</p>
+                        <li className='text-gray-300 text-lg'>Persistent storage for containers: Data stored in a volume survives container restarts and deletions.</li>
+                        <li className='text-gray-300 text-lg'>Docker managed: Volumes are created, managed, and stored by Docker, typically in /var/lib/docker/volumes on Linux.</li>
+                        <li className='text-gray-300 text-lg'>Mounted to container paths: Data written to the mounted directory in the container goes to the volume.</li>
+                        <li className='text-gray-300 text-lg'>Data sharing: Multiple containers can access and modify the same volume.</li>
+                        <li className='text-gray-300 text-lg'>Easy backup and restore: Volumes simplify data backup and recovery processes.</li>
+                        <li className='text-gray-300 text-lg'>Named vs. Anonymous: Named volumes are user-defined and recommended, while anonymous volumes are automatically created and tied to the container's lifecycle.</li>
+                        <li className='text-gray-300 text-lg'>Volume drivers: Allow storing volumes on remote hosts or cloud providers.</li>
+                        <p className='text-gray-300 text-lg'>We use -v tag for defining volume.</p>
+                        <CodeBlock code={`docker run -it -v /Users/RUDRANARAYAN/Desktop/data:/test/data ubuntu `} />
+                        <p className='text-gray-300 text-lg'>Here u I'm giving the path where docker container will be store, and RUDRANARAYAN is my device name or hostname.</p>
+                        <p className='text-gray-300 text-lg'>Here we are mapping a local directory to a container directory</p>
+                        <Image src="/img/Docker/image-27.png" alt='img' height={500} width={1000} />
+                        <p className='text-gray-300 text-lg'>Now go to inside data folder  cd data, and then create two new file  touch index.html and touch server.js.</p>
+                        <p className='text-gray-300 text-lg'>To mount our project we can just add a volume inside mongodb.yaml file</p>
+                        <Image src="/img/Docker/image-28.png" alt='img' height={500} width={1000} />
+                        <p className='text-gray-300 text-lg'>Then run the yaml file (must ensure that we have no running container)</p>
+                        <CodeBlock code={`docker compose -f mongodb.yaml  up `} />
+                    </motion.div>
+                    <motion.div
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: 0.4 }}
+                        className="space-y-4"
+                    >
+                        <h2 className="text-2xl font-semibold text-white border-b border-gray-700 pb-1">Docker Volume Commands</h2>
+                        <CodeBlock code={`docker volume ls`} />
+                        <CodeBlock code={`docker volume create VOL_NAME`} />
+                        <CodeBlock code={`docker volume rm VOL_NAME`} />
+                        <p className='text-lg text-gray-300'>Named Volumes(Managed by docker)</p>
+                        <CodeBlock code={`docker run -v VOL_NAME:CONT_DIR`} />
+                        <p className='text-lg text-gray-300'>Bind Mount(Managed by host only)</p>
+                        <CodeBlock code={`docker run -v HOST_DIR:CONT_DIR`} />
+                        <p className='text-lg text-gray-300'>Anonomous Volume (Managed by docker)</p>
+                        <CodeBlock code={`docker run -v MOUNT_PATH`} />
+                        <p className='text-lg text-gray-300'>Delete all ananomous volumes</p>
+                        <CodeBlock code={`docker volume prune`} />
                     </motion.div>
 
                 </motion.div>
