@@ -30,7 +30,7 @@ const Hero = React.forwardRef<HTMLElement, unknown>((_, ref) => {
         AI Meets Full Stack | Projects That Talk, Think & Act
       </motion.h1>
 
-      {/*  Replace 'John Doe' with your actual name */}
+      
       <motion.h4
         initial="hidden"
         whileInView="visible"
