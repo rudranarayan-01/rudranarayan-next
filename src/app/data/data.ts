@@ -129,6 +129,23 @@ export const projects = [
     image: "/img/svd.jpg", // Update with the actual project image
   },
   {
+    name: "LIMMY AI  v1.0",
+    description: "A smart virtual assistant built with Python that understands and responds to voice commands using intelligent automation.",
+    points: [
+      "Smart Query Handling",
+      "Multilanguage support",
+      "Capable of interacting with desktop applications",
+    ],
+    techStack: [
+      { name: "Python", icon: SiPython, color: "#1338BE" },
+      { name: "Selenium Web Driver", icon: SiWebdriverio, color: "#fff" },
+
+    ],
+    liveLink: "https://www.linkedin.com/posts/rudranarayan-sahu-b7b9a6244_ai-python-automation-activity-7293335824090157056-rpvY?utm_source=share&utm_medium=member_desktop&rcm=ACoAADyoxQ8BmIPWlJBebLnKbJlzJdfYeyoFJmE",
+    githubLink: "https://github.com/rudranarayan-01/LIMMY-0.1",
+    image: "/img/limmy.png", // Update with the actual project image
+  },
+  {
     name: "AI-Interview",
     description: "A smart web app that simulates interviews based on user skills and experience for effective job prep.",
     points: [
@@ -148,21 +165,23 @@ export const projects = [
     image: "/img/ai-inter.png", // Update with the actual project image
   },
   {
-    name: "LIMMY AI  v1.0",
-    description: "A smart virtual assistant built with Python that understands and responds to voice commands using intelligent automation.",
+    name: "Coaching Website for my client",
+    description: "Created a responsive coaching website using Next.js and Firebase with real-time course listings, contact form, and client-managed content.",
     points: [
-      "Smart Query Handling",
-      "Multilanguage support",
-      "Capable of interacting with desktop applications",
-    ],
-    techStack: [
-      { name: "Python", icon: SiPython, color: "#1338BE" },
-      { name: "Selenium Web Driver", icon: SiWebdriverio, color: "#fff" },
+      "Built coaching website with Next.js, Firebase",
+      "Integrated real-time Firestore course listings",
+      "Designed responsive UI with dynamic routing"
 
     ],
-    liveLink: "https://www.linkedin.com/posts/rudranarayan-sahu-b7b9a6244_ai-python-automation-activity-7293335824090157056-rpvY?utm_source=share&utm_medium=member_desktop&rcm=ACoAADyoxQ8BmIPWlJBebLnKbJlzJdfYeyoFJmE",
-    githubLink: "https://github.com/rudranarayan-01/LIMMY-0.1",
-    image: "/img/limmy.png", // Update with the actual project image
+    techStack: [
+      { name: "TypeScript", icon: SiTypescript, color: "#3178C6" },
+      { name: "Next.js", icon: RiNextjsLine, color: "#fff" },
+      { name: "Tailwind CSS", icon: SiTailwindcss, color: "#38B2AC" },
+      { name: "Firebase", icon: SiFirebase, color: "#FFCA28" },
+    ],
+    liveLink: "https://ai-interview-01.vercel.app",
+    githubLink: "https://github.com/rudranarayan-01/AI-Interview",
+    image: "/img/ai-inter.png", // Update with the actual project image
   },
   {
     name: "Digital Attendance",
