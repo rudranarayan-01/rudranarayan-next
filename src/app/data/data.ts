@@ -234,7 +234,7 @@ export const personalInfo = {
 export const education1 = {
   college: "Utkal University",
   course: "Master of Computer Applications",
-  cgpa: "7.5",
+  cgpa: "8.2",
   duration: "2023 - 2025",
 };
 
