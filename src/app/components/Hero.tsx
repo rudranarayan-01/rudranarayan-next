@@ -66,7 +66,7 @@ const Hero = React.forwardRef<HTMLElement, unknown>((_, ref) => {
             }}
             transition={{ duration: 0.5 }}
           >
-            👋<FaLinkedinIn/>
+            <FaLinkedinIn/>
           </motion.span>
           Let&apos;s Connect
         </motion.a>
