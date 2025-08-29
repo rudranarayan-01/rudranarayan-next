@@ -2,7 +2,7 @@
 // Place all images in the "img" folder inside the "public" directory and reference them using the path: "/img/FILE_NAME".
 import { BiLogoPython, BiLogoPostgresql, BiLogoFirebase } from "react-icons/bi";
 import { FiHome, FiMail } from "react-icons/fi";
-import { FaBlog, FaGithub, FaLinkedinIn } from "react-icons/fa";
+import { FaBlog, FaGithub } from "react-icons/fa";
 import { TbUserSquare } from "react-icons/tb";
 import { FaReact, FaNodeJs } from "react-icons/fa";
 import { DiMysql } from "react-icons/di";
