@@ -78,10 +78,10 @@ export const navbarData: NavbarItem[] = [
   { name: "Contact", type: "scroll", icon: FiMail, size: "18px" },
   { name: "Blog", type: "link", icon: FaBlog, size: "18px", url: "/blog" },
   {
-    name: "LinkedIn",
+    name: "Github",
     type: "link",
-    icon: FaLinkedinIn,
-    url: "https://www.linkedin.com/in/rudranarayan-sahu-b7b9a6244/", // Replace "#" with your LinkedIn profile URL.
+    icon: FaGithub,
+    url: "https://github.com/rudranarayan-01", // Replace "#" with your LinkedIn profile URL.
     size: "18px",
   },
 ];
