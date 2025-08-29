@@ -3,6 +3,7 @@ import React from "react";
 import { HiOutlineArrowDown } from "react-icons/hi";
 import { motion } from "motion/react";
 import { fadeInDown, fadeInUp } from "../data/variants";
+import { FaLinkedinIn } from "react-icons/fa";
 
 const Hero = React.forwardRef<HTMLElement, unknown>((_, ref) => {
   return (
@@ -65,7 +66,7 @@ const Hero = React.forwardRef<HTMLElement, unknown>((_, ref) => {
             }}
             transition={{ duration: 0.5 }}
           >
-            👋
+            👋<FaLinkedinIn/>
           </motion.span>
           Let&apos;s Connect
         </motion.a>
