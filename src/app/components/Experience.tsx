@@ -4,6 +4,12 @@ import React, { useEffect, useRef } from "react";
 
 const experiences = [
   {
+    role: "Freelancing",
+    duration: "Jul 2023 – Present",
+    description:
+      "I provide full stack development services, building responsive websites and web applications using React, Next.js, Node.js, and MongoDB. I collaborate with clients to deliver scalable, secure, and user-friendly solutions tailored to their needs.",
+  },
+  {
     role: "Machine Learning Intern",
     company: "CodeAlpha",
     duration: "Jan 2025 – Apr 2025",
