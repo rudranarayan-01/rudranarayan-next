@@ -76,7 +76,7 @@ const Hero = React.forwardRef<HTMLElement, unknown>((_, ref) => {
           variants={{
             hover: { scale: 1.05 },
           }}
-          href="https://drive.google.com/file/d/1nKoPknPEWqZxoWRlfBJNRNzSTtm8fc5W/view?usp=sharing" // Replace '#' with the Google Drive link to your resume
+          href="https://drive.google.com/file/d/1PF3EVkvZ9HJ0P601C0Vh1kc9bMMhGs4w/view?usp=sharing" // Replace '#' with the Google Drive link to your resume
           target="_blank"
           rel="noopener noreferrer"
           className="px-8 flex justify-center items-center gap-2 py-2 rounded-full border border-neutral-600 text-sm md:text-lg cursor-pointer"
