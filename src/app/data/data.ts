@@ -166,11 +166,11 @@ export const projects = [
   },
   {
     name: "TeamSync - The project manager",
-    description: "Created a responsive coaching website using Next.js and Firebase with real-time course listings, contact form, and client-managed content.",
+    description: "A full-stack SaaS tool for managing teams, projects, and workflows with workspace creation, role assignments, and progress tracking.",
     points: [
-      "Built coaching website with Next.js, Firebase",
-      "Integrated real-time Firestore course listings",
-      "Designed responsive UI with dynamic routing"
+      "Developed using MERN Stack with secure authentication and scalable APIs.",
+      "Implemented real-time MongoDB updates for instant task and workspace changes.",
+      "Designed responsive UI using Redix UI with dynamic routing"
 
     ],
     techStack: [
@@ -179,6 +179,8 @@ export const projects = [
       { name: "Redux Toolkit", icon: SiRedux, color: "#764ABC" },
       { name: "Tailwind CSS", icon: SiTailwindcss, color: "#38B2AC" },
       { name: "MongoDB", icon: SiFirebase, color: "#FFCA28" },
+      { name: "NodeJS", icon: FaNodeJs, color: "#83CD29" },
+      { name: "ExpressJS", icon: SiExpress, color: "#C9D1D9" },
     ],
     liveLink: "https://gajanana-classes.vercel.app/",
     githubLink: "/",
