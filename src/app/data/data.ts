@@ -165,6 +165,26 @@ export const projects = [
     image: "/img/ai-inter.png", // Update with the actual project image
   },
   {
+    name: "TeamSync - The project manager",
+    description: "Created a responsive coaching website using Next.js and Firebase with real-time course listings, contact form, and client-managed content.",
+    points: [
+      "Built coaching website with Next.js, Firebase",
+      "Integrated real-time Firestore course listings",
+      "Designed responsive UI with dynamic routing"
+
+    ],
+    techStack: [
+      { name: "TypeScript", icon: SiTypescript, color: "#3178C6" },
+      { name: "React.js", icon: FaReact, color: "#61DAFB" },
+      { name: "Redux Toolkit", icon: SiRedux, color: "#764ABC" },
+      { name: "Tailwind CSS", icon: SiTailwindcss, color: "#38B2AC" },
+      { name: "MongoDB", icon: SiFirebase, color: "#FFCA28" },
+    ],
+    liveLink: "https://gajanana-classes.vercel.app/",
+    githubLink: "/",
+    image: "/img/coaching.png", // Update with the actual project image
+  },
+  {
     name: "Coaching Website for my client",
     description: "Created a responsive coaching website using Next.js and Firebase with real-time course listings, contact form, and client-managed content.",
     points: [
