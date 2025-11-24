@@ -178,7 +178,7 @@ export const projects = [
       { name: "React.js", icon: FaReact, color: "#61DAFB" },
       { name: "Redux Toolkit", icon: SiRedux, color: "#764ABC" },
       { name: "Tailwind CSS", icon: SiTailwindcss, color: "#38B2AC" },
-      { name: "MongoDB", icon: SiFirebase, color: "#FFCA28" },
+      { name: "MongoDB", icon: SiMongodb, color: "#47A248" },
       { name: "NodeJS", icon: FaNodeJs, color: "#83CD29" },
       { name: "ExpressJS", icon: SiExpress, color: "#C9D1D9" },
     ],
