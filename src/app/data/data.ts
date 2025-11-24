@@ -183,7 +183,7 @@ export const projects = [
       { name: "ExpressJS", icon: SiExpress, color: "#C9D1D9" },
     ],
     liveLink: "",
-    githubLink: "/",
+    githubLink: "https://github.com/rudranarayan-01/Team-Sync",
     image: "/img/teamsync.png", // Update with the actual project image
   },
   {
