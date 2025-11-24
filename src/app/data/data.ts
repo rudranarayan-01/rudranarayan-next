@@ -182,9 +182,9 @@ export const projects = [
       { name: "NodeJS", icon: FaNodeJs, color: "#83CD29" },
       { name: "ExpressJS", icon: SiExpress, color: "#C9D1D9" },
     ],
-    liveLink: "https://gajanana-classes.vercel.app/",
+    liveLink: "",
     githubLink: "/",
-    image: "/img/coaching.png", // Update with the actual project image
+    image: "/img/teamsync.png", // Update with the actual project image
   },
   {
     name: "Coaching Website for my client",
