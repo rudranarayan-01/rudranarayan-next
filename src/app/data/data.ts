@@ -240,7 +240,7 @@ export const projects = [
     githubLink: "https://github.com/rudranarayan-01/Datapirates",
     image: "/img/datapirates.png", // Update with the actual project image
   },
-   {
+  {
     name: "AI-Pocket-Agent",
     description: "AI Pocket Agent is a mobile AI chat application that allows users to create custom AI agents, chat with them in real time, send images, and save conversations to the cloud.",
     points: [
@@ -255,8 +255,8 @@ export const projects = [
     ],
     liveLink: "/",
     githubLink: "https://github.com/rudranarayan-01/mobile-agent-AI",
-    image: "/img/datapirates.png", // Update with the actual project image
-  },
+    image: "/img/ai-pocket-agent.jpeg", // Update with the actual project image
+  }
 ];
 
 
