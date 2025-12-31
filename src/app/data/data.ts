@@ -251,6 +251,7 @@ export const projects = [
     techStack: [
       { name: "React Native", icon: FaReact, color: "#61DAFB" },
       { name: "TypeScript", icon: SiTypescript, color: "#3178C6" },
+      { name: "Firebase", icon: SiFirebase, color: "#FFCA28" }
     ],
     liveLink: "/",
     githubLink: "https://github.com/rudranarayan-01/mobile-agent-AI",
