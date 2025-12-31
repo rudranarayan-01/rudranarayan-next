@@ -240,23 +240,23 @@ export const projects = [
     githubLink: "https://github.com/rudranarayan-01/Datapirates",
     image: "/img/datapirates.png", // Update with the actual project image
   },
-  {
-    name: "AI-Pocket-Agent",
-    description: "AI Pocket Agent is a mobile AI chat application that allows users to create custom AI agents, chat with them in real time, send images, and save conversations to the cloud.",
-    points: [
-      "Real-time chat with AI models",
-      "Supports system prompts per agent",
-      "Clean chat UI with typing, copy, and loading states",
-    ],
-    techStack: [
-      { name: "React Native", icon: FaReact, color: "#61DAFB" },
-      { name: "TypeScript", icon: SiTypescript, color: "#3178C6" },
-      { name: "Firebase", icon: SiFirebase, color: "#FFCA28" }
-    ],
-    liveLink: "/",
-    githubLink: "https://github.com/rudranarayan-01/mobile-agent-AI",
-    image: "/img/ai-pocket-agent.jpeg", // Update with the actual project image
-  }
+  // {
+  //   name: "AI-Pocket-Agent",
+  //   description: "AI Pocket Agent is a mobile AI chat application that allows users to create custom AI agents, chat with them in real time, send images, and save conversations to the cloud.",
+  //   points: [
+  //     "Real-time chat with AI models",
+  //     "Supports system prompts per agent",
+  //     "Clean chat UI with typing, copy, and loading states",
+  //   ],
+  //   techStack: [
+  //     { name: "React Native", icon: FaReact, color: "#61DAFB" },
+  //     { name: "TypeScript", icon: SiTypescript, color: "#3178C6" },
+  //     { name: "Firebase", icon: SiFirebase, color: "#FFCA28" }
+  //   ],
+  //   liveLink: "/",
+  //   githubLink: "https://github.com/rudranarayan-01/mobile-agent-AI",
+  //   image: "/img/ai-pocket-agent.jpeg", // Update with the actual project image
+  // }
 ];
 
 
