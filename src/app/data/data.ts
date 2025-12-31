@@ -182,7 +182,7 @@ export const projects = [
       { name: "NodeJS", icon: FaNodeJs, color: "#83CD29" },
       { name: "ExpressJS", icon: SiExpress, color: "#C9D1D9" },
     ],
-    liveLink: "",
+    liveLink: "https://teamsync-frontend-605k.onrender.com",
     githubLink: "https://github.com/rudranarayan-01/Team-Sync",
     image: "/img/teamsync.png", // Update with the actual project image
   },
@@ -238,6 +238,23 @@ export const projects = [
     ],
     liveLink: "https://datapirateslearning.netlify.app/",
     githubLink: "https://github.com/rudranarayan-01/Datapirates",
+    image: "/img/datapirates.png", // Update with the actual project image
+  },
+   {
+    name: "AI-Pocket-Agent",
+    description: "AI Pocket Agent is a mobile AI chat application that allows users to create custom AI agents, chat with them in real time, send images, and save conversations to the cloud.",
+    points: [
+      "Real-time chat with AI models",
+      "Supports system prompts per agent",
+      "Clean chat UI with typing, copy, and loading states",
+    ],
+    techStack: [
+      { name: "React Native", icon: FaReact, color: "#61DAFB" },
+      { name: "TypeScript", icon: SiTypescript, color: "#3178C6" },
+      ,
+    ],
+    liveLink: "/",
+    githubLink: "https://github.com/rudranarayan-01/mobile-agent-AI",
     image: "/img/datapirates.png", // Update with the actual project image
   },
 ];
