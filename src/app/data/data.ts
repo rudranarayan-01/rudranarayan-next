@@ -255,7 +255,7 @@ export const projects = [
     ],
     liveLink: "/",
     githubLink: "https://github.com/rudranarayan-01/mobile-agent-AI",
-    image: "/img/dpublic\img\ai-pocket-agent.jpeg", // Update with the actual project image
+    image: "/img/ai-pocket-agent.jpeg", // Update with the actual project image
   }
 ];
 
