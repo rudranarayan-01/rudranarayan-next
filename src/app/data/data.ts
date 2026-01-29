@@ -238,7 +238,7 @@ export const projects = [
     ],
     liveLink: "https://datapirateslearning.netlify.app/",
     githubLink: "https://github.com/rudranarayan-01/Datapirates",
-    image: "/img/datapirates.png", // Update with the actual project image
+    image: "/img/datapirates.png", 
   },
   {
     name: "AI-Pocket-Agent",
