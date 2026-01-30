@@ -256,6 +256,23 @@ export const projects = [
     liveLink: "/",
     githubLink: "https://github.com/rudranarayan-01/mobile-agent-AI",
     image: "/img/ai-pocket-agent.jpeg", 
+  },
+  {
+    name: "Apex News : A news website using Django",
+    description: "A responsive news website built with Django and Python, featuring a clean UI and dynamic content management.",
+    points: [
+      "Responsive design for all devices",
+      "Dynamic content management system with admin dashboard",
+      "Fast loading and optimized performance",
+    ],
+    techStack: [
+        { name: "Django", icon: SiDjango, color: "#092E29" },
+        { name: "Mysql ", icon: DiMysql, color: "#F29111 " },
+        { name: "Python", icon: BiLogoPython, color: "#1338BE" },
+    ],
+    liveLink: "https://techie148.pythonanywhere.com/",
+    githubLink: "https://github.com/rudranarayan-01/Blog",
+    image: "/img/django-blog.png", 
   }
 ];
 
