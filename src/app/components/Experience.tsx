@@ -4,6 +4,13 @@ import React, { useEffect, useRef } from "react";
 
 const experiences = [
   {
+    role: "Full Stack Developer",
+    company:"Maastrix Solutions",
+    duration: "Mar 2026 – Present",
+    description:
+      "Primarily focused on building scalable and efficient server-side systems using modern technologies, along with developing cross-platform mobile applications using React Native. Experienced in designing RESTful APIs, handling database operations, and ensuring seamless integration between frontend and backend systems. Adept at optimizing performance, debugging complex issues, and delivering robust, user-centric solutions in fast-paced development environments.",
+  },
+  {
     role: "Freelancing",
     duration: "Jul 2023 – Present",
     description:

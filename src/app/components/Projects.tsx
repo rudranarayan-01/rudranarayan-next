@@ -6,6 +6,7 @@ import { motion } from "motion/react";
 import { FiExternalLink } from "react-icons/fi";
 import { FaGithub } from "react-icons/fa";
 import { fadeInUp, fadeInUpDelay, fadeInUpLarge } from "../data/variants";
+import Link from "next/link";
 
 const Projects = React.forwardRef<HTMLElement, unknown>((props, ref) => {
   const [isLargeScreen, setIsLargeScreen] = useState(false);
@@ -58,9 +59,11 @@ const Projects = React.forwardRef<HTMLElement, unknown>((props, ref) => {
               whileInView="visible"
               className="projectinfo flex flex-1 flex-col p-4 md:p-8 h-96"
             >
+            <Link href={project.liveLink} target="_blank" rel="noopener noreferrer">
               <h3 className="text-xl md:text-3xl border-b border-neutral-600 pb-2 text-neutral-100 font-semibold">
                 {project.name}
               </h3>
+            </Link>
               <p className="text-neutral-100 mt-2">{project.description}</p>
               <ul>
                 {project.points.map((listItem, index) => (

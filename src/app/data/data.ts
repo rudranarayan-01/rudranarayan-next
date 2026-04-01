@@ -91,6 +91,26 @@ export const navbarData: NavbarItem[] = [
 // Add your projects here with their descriptions, features, and tech stack.
 export const projects = [
   {
+    name: "HouseXpertz",
+    description: "HouseXpertz is a handyman service platform connecting users with professionals. Integrated AI chatbot provides service-based responses and improves customer interaction experience.",
+    points: [
+      "AI chatbot suggests services based on user queries instantly",
+      "Real-time booking system with service tracking and updates",
+      "Admin panel to manage services, users, and bookings efficiently",
+    ],
+    techStack: [
+      { name: "ReactJS", icon: FaReact, color: "#61DAFB" },
+      { name: "Tailwind CSS", icon: SiTailwindcss, color: "#38B2AC" },
+      { name: "Shadcn-UI", icon: SiShadcnui, color: "#fff" },
+      { name: "Node.js", icon: FaNodeJs, color: "#83CD29" },
+      { name: "MongoDB", icon: SiMongodb, color: "#47A248" },
+
+    ],
+    liveLink: "https://housexpertz.in/",
+    githubLink: "https://github.com/rudranarayan-01",
+    image: "/img/houseXpertz.png", // Update with the actual project image
+  },
+  {
     name: "NextStep-AI",
     description: "NextStep-AI is your smart career companion, designed to streamline job preparation with AI-powered tools",
     points: [
@@ -238,7 +258,7 @@ export const projects = [
     ],
     liveLink: "https://datapirateslearning.netlify.app/",
     githubLink: "https://github.com/rudranarayan-01/Datapirates",
-    image: "/img/datapirates.png", 
+    image: "/img/datapirates.png",
   },
   {
     name: "AI-Pocket-Agent",
@@ -255,7 +275,7 @@ export const projects = [
     ],
     liveLink: "/",
     githubLink: "https://github.com/rudranarayan-01/mobile-agent-AI",
-    image: "/img/ai-pocket-agent.jpeg", 
+    image: "/img/ai-pocket-agent.jpeg",
   },
   {
     name: "Apex News : A news website using Django",
@@ -266,13 +286,13 @@ export const projects = [
       "Fast loading and optimized performance",
     ],
     techStack: [
-        { name: "Django", icon: SiDjango, color: "#092E29" },
-        { name: "Mysql ", icon: DiMysql, color: "#F29111 " },
-        { name: "Python", icon: BiLogoPython, color: "#1338BE" },
+      { name: "Django", icon: SiDjango, color: "#092E29" },
+      { name: "Mysql ", icon: DiMysql, color: "#F29111 " },
+      { name: "Python", icon: BiLogoPython, color: "#1338BE" },
     ],
     liveLink: "https://techie148.pythonanywhere.com/",
     githubLink: "https://github.com/rudranarayan-01/Blog",
-    image: "/img/django-blog.png", 
+    image: "/img/django-blog.png",
   }
 ];
 
