@@ -10,7 +10,7 @@ export default function CatchErrorRoutes() {
   }, [router]);
 
   return (
-    <div className="flex flex-col items-center justify-center h-screen text-center  px-4">
+    <div className="flex flex-col items-center justify-center h-screen text-center bg-black  px-4">
       <h1 className="text-2xl md:text-3xl font-semibold text-neutral-100 mb-4">
         Oops! This page doesn&apos;t exist.
       </h1>
