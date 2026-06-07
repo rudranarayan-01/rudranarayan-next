@@ -6,7 +6,7 @@ import { marked } from "marked";
 import Script from "next/script";
 
 type Props = {
-  params: Promise<{ slug: string }> | { slug: string };
+  params: Promise<{ slug: string }>;
 };
 
 export async function generateStaticParams() {
@@ -17,7 +17,7 @@ export async function generateStaticParams() {
 }
 
 export async function generateMetadata({ params }: Props) {
-  const resolvedParams = await params;
+  const resolvedParams = await params; 
   const blogs = getAllBlogs();
   const blog = blogs.find((b) => b.slug === resolvedParams.slug);
 
