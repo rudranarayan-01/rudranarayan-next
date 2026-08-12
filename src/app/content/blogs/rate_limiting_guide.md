@@ -1,11 +1,10 @@
-# Production-Grade Rate Limiting for Web Applications: A Comprehensive Guide & Developer Playbook
-
-> **Author**: Engineering Lead  
-> **Target Audience**: Backend Engineers, DevOps, System Architects  
-> **Topic**: Production-Grade Rate Limiting Architecture for Authenticated and Unauthenticated Users  
-> **Format**: Markdown Technical Guide & Blog Post  
-
 ---
+title: "Production-Grade Rate Limiting: Architecture, Security, and Edge-to-App Implementation"
+excerpt: "A comprehensive guide and developer playbook for implementing resilient rate limiting across authenticated and unauthenticated traffic using Redis, Lua, and multi-tier defense."
+date: "2026-08-12"
+tags: ["System Design", "Rate Limiting", "Security", "Backend Engineering", "Redis"]
+---
+
 
 ## Executive Summary & Overview
 
@@ -68,7 +67,8 @@ Selecting the correct algorithm depends on precision requirements, memory constr
 
 #### C. Sliding Window Counter (Production Standard)
 * **Mechanism**: Combines the current window count and the previous window count, weighted by time remaining in the current window.
-  $$	ext{Estimated Requests} = 	ext{Count}_{	ext{current}} + 	ext{Count}_{	ext{previous}} 	imes \left(1 - rac{	ext{Time Elapsed in Current Window}}{	ext{Window Size}}ight)$$
+  $$	ext{Estimated Requests} = 	ext{Count}_{	ext{current}} + 	ext{Count}_{	ext{previous}} 	imes \left(1 - rac{	ext{Time Elapsed in Current Window}}{	ext{Window Size}}
+ight)$$
 * **Pros**: $O(1)$ memory, smooth boundary handling, highly scalable.
 * **Verdict**: **Recommended for general web APIs and IP-based rate limiting.**
 
@@ -127,7 +127,8 @@ When moving rate limiting to production, naïve implementations fail due to bypa
 ### 2. IPv6 Subnet Aggregation (`/64` Subnet Masking)
 * **Danger**: An attacker with IPv6 allocation can instantly generate billions of unique IP addresses within a single `/64` subnet (e.g., `2001:db8:abcd:0012::/64`), invalidating individual IP tracking.
 * **Solution**: Truncate IPv6 addresses to their `/64` subnet prefix before using them as a key in Redis.
-* **Formula**: Standardize IPv6 addresses into CIDR blocks: `2001:db8:abcd:0012:0000:0000:0000:0001` $ightarrow$ `2001:db8:abcd:0012::/64`.
+* **Formula**: Standardize IPv6 addresses into CIDR blocks: `2001:db8:abcd:0012:0000:0000:0000:0001` $
+ightarrow$ `2001:db8:abcd:0012::/64`.
 
 ### 3. Distributed Concurrency & Atomicity (Lua Scripts)
 * **Danger**: Read-Then-Write race conditions. If two application pods query Redis simultaneously (`GET count`), both read `99`, both allow the request, and both write `SET count 100`, bypassing a limit of `100`.
