@@ -11,8 +11,10 @@
   "dependencies": {
     "@next/third-parties": "^15.2.2",
     "@tailwindcss/typography": "^0.5.19",
+    "@xyflow/react": "^12.11.6",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "cmdk": "^1.1.1",
     "framer-motion": "^12.16.0",
     "gray-matter": "^4.0.3",
     "lucide-react": "^0.513.0",

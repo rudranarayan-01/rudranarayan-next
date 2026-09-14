@@ -9,6 +9,8 @@ import Projects from "./components/Projects";
 import Achievements from "./components/Achievement";
 import Experience from "./components/Experience";
 import ServicesSection from "./components/Services";
+import { ArchitectureFlow } from "./components/ArchitectureFlow";
+import { OpenSourceGrid } from "./components/OpenSourceGrid";
 
 export default function Home() {
   const sectionRefs = {
@@ -24,6 +26,8 @@ export default function Home() {
       <Hero ref={sectionRefs.home} />
       <AboutMe ref={sectionRefs.about} />
       <Experience/>
+      {/* <ArchitectureFlow /> */}
+      <OpenSourceGrid/>
       <Projects ref={sectionRefs.projects} />
       <Achievements/>
       <ServicesSection/>

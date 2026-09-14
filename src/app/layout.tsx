@@ -3,6 +3,8 @@ import { Outfit } from "next/font/google";
 import "./globals.css";
 import RippleCursor from "./components/RippleCursor";
 import React from 'react';
+import { CommandPalette } from "./components/CommandPalette";
+import { BlogToast } from "./components/BlogToast";
 
 const outfit = Outfit({
   subsets: ["latin"],
@@ -12,11 +14,11 @@ const outfit = Outfit({
 });
 
 export const metadata: Metadata = {
-  title: "Rudranarayan - Full Stack Developer", // Replace "Your Name" with your actual name
+  title: "Rudranarayan - Full Stack Developer",
   description:
     "Building scalable and performant web applications with modern technologies.",
   keywords: [
-    "Rudranarayan Sahu", // Replace "Your Name" with your actual name
+    "Rudranarayan Sahu",
     "Full Stack Developer",
     "React",
     "Next.js",
@@ -24,27 +26,27 @@ export const metadata: Metadata = {
     "Web Developer",
   ],
   openGraph: {
-    title: "Rudranarayan - Portfolio", // Replace "Your Name" with your actual name
+    title: "Rudranarayan - Portfolio",
     description:
       "Building scalable and performant web applications with modern technologies.",
-    url: "#", // Replace "#" with your deployed website URL
-    siteName: "Rudranarayan Portfolio", // Replace "Your Name" with your actual name
+    url: "https://rudranarayansahu.dev",
+    siteName: "Rudranarayan Portfolio",
     images: [
       {
-        url: "/img/preview.png", // Take a screenshot of your homepage and save it as "preview.png" in the "public/img" folder.
+        url: "/img/preview.png",
         width: 1200,
         height: 630,
-        alt: "Rudranarayan - Portfolio", // Replace "Your Name" with your actual name
+        alt: "Rudranarayan - Portfolio",
       },
     ],
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Rudranarayan - Portfolio", // Replace "Your Name" with your actual name
+    title: "Rudranarayan - Portfolio",
     description:
       "Building scalable and performant web applications with modern technologies.",
-    images: ["/img/preview.png"], // Take a screenshot of your homepage and save it as "preview.png" in the "public/img" folder.
+    images: ["/img/preview.png"],
   },
   robots: "index, follow",
 };
@@ -57,7 +59,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${outfit.variable} antialiased`}>
-        <RippleCursor/>
+        <RippleCursor />
+        <CommandPalette />
+        <BlogToast />
         {children}
       </body>
     </html>
