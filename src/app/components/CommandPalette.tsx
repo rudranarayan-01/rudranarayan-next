@@ -33,7 +33,7 @@ export const CommandPalette = () => {
           <FiTerminal className="text-emerald-400 text-sm transition-transform duration-300 group-hover:rotate-6" />
           <span className="hidden sm:inline">Quick Actions</span>
           <kbd className="rounded-md bg-neutral-800/80 border border-neutral-700/60 px-1.5 py-0.5 text-[10px] font-mono text-neutral-400 group-hover:text-neutral-200">
-            ⌘K
+            ⌘ K
           </kbd>
         </button>
       </div>
