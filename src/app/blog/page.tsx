@@ -1,29 +1,36 @@
-'use client'
+import React from "react";
+import { getAllBlogs } from "@/lib/blogs";
+import BlogDashboardClient from "@/app/components/BlogDashboardClient";
+export const metadata = {
+  title: "Engineering Blog | Portfolio Insights",
+  description: "Deep dives into system architectures, full-stack pipelines, and production machine learning.",
+};
 
-import React from 'react'
-import DockerTutorial from '../components/DockerTutorial'
-import Footer from '../components/Footer'
+export default function BlogDashboard() {
+  const blogs = getAllBlogs();
 
+  return (
+    <main className="min-h-screen bg-black text-white py-24 px-4 md:px-16 selection:bg-neutral-800 selection:text-white">
+      <div className="max-w-6xl mx-auto">
+        
+        {/* Modern Enterprise Header Structure */}
+        <header className="mb-16 max-w-2xl">
+          <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-neutral-900 border border-neutral-800 text-[11px] font-mono text-neutral-400 mb-4">
+            <span className="h-1.5 w-1.5 rounded-full bg-blue-500 animate-pulse"/>
+            CENTRAL_RESOURCES_LOG
+          </div>
+          <h1 className="text-4xl md:text-6xl font-bold tracking-tight bg-gradient-to-b from-white via-neutral-200 to-neutral-500 bg-clip-text text-transparent mb-4">
+            Writing & Insights
+          </h1>
+          <p className="text-neutral-400 text-sm md:text-base leading-relaxed font-light">
+            An index tracking software engineering blueprints, clean architecture design principles, and production telemetry deep dives.
+          </p>
+        </header>
 
-
-export default function BlogPage() {
-    return (
-        <main className="min-h-screen bg-black text-white px-6 md:px-12 py-3">
-
-            <div className="max-w-5xl mx-auto py-12">
-                <h1 className="text-4xl md:text-6xl font-semibold text-center animated-text-gradient mb-4 text-white tracking-tight">
-                    My Dev Playbook
-                </h1>
-                <p className="text-center text-gray-400 mb-12 text-lg">
-                    Explore hands-on tutorials, code walkthroughs, and guides from real-world projects.
-                </p>
-
-                <div className="space-y-10">
-                    <DockerTutorial />
-                    {/* Add more tutorials like <AnotherTutorial /> */}
-                </div>
-            </div>
-            <Footer />
-        </main>
-    )
+        {/* Clean Interface Interactive Layer */}
+        <BlogDashboardClient initialBlogs={blogs} />
+        
+      </div>
+    </main>
+  );
 }
