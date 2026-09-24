@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import { Command } from "cmdk";
 import { 
   FiFolder, FiFileText, FiLinkedin, FiGithub, 
-  FiMail, FiTerminal, FiX, FiLayers, FiExternalLink 
+  FiMail, FiTerminal, FiX, FiExternalLink 
 } from "react-icons/fi";
 
 export const CommandPalette = () => {
@@ -13,11 +13,13 @@ export const CommandPalette = () => {
   // Keyboard shortcut listener (Cmd+K or Ctrl+K)
   useEffect(() => {
     const down = (e: KeyboardEvent) => {
-      if (e.key.toLowerCase() === "k" && (e.metaKey || e.ctrlKey)) {
+      // Added optional chaining (e.key?.toLowerCase()) to prevent undefined errors
+      if (e.key?.toLowerCase() === "k" && (e.metaKey || e.ctrlKey)) {
         e.preventDefault();
         setOpen((prev) => !prev);
       }
     };
+
     document.addEventListener("keydown", down);
     return () => document.removeEventListener("keydown", down);
   }, []);
@@ -87,20 +89,6 @@ export const CommandPalette = () => {
                     </div>
                     <span className="text-[10px] text-neutral-500 font-mono">#projects</span>
                   </Command.Item>
-
-                  {/* <Command.Item
-                    onSelect={() => { 
-                      window.location.href = "#architecture"; 
-                      setOpen(false); 
-                    }}
-                    className="flex items-center justify-between gap-3 rounded-xl px-3 py-2.5 text-neutral-200 cursor-pointer transition-colors hover:bg-neutral-800/70 hover:text-white data-[selected='true']:bg-neutral-800 data-[selected='true']:text-white"
-                  >
-                    <div className="flex items-center gap-3">
-                      <FiLayers className="text-neutral-400 text-sm" /> 
-                      <span className="text-xs sm:text-sm">System Architecture Visualizer</span>
-                    </div>
-                    <span className="text-[10px] text-neutral-500 font-mono">#architecture</span>
-                  </Command.Item> */}
 
                   <Command.Item
                     onSelect={() => { 
