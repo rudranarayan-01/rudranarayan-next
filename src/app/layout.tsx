@@ -1,10 +1,8 @@
 import type { Metadata } from "next";
 import { Outfit } from "next/font/google";
 import "./globals.css";
-import RippleCursor from "./components/RippleCursor";
 import React from 'react';
-import { CommandPalette } from "./components/CommandPalette";
-import { BlogToast } from "./components/BlogToast";
+import PublicDecorators from "./components/PublicDecorators";
 
 const outfit = Outfit({
   subsets: ["latin"],
@@ -59,9 +57,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${outfit.variable} antialiased`}>
-        <RippleCursor />
-        <CommandPalette />
-        <BlogToast />
+        <PublicDecorators />
         {children}
       </body>
     </html>
