@@ -323,15 +323,26 @@ export const education2 = {
 
 
 
-// Update your work experience
-export const experience = {
-  companyName: "Sample Tech Company",
-  title: "Front-End Developer Intern",
-  duration: "Jan 2023 - July 2023",
-  location: "Remote",
-  points: [
-    "Developed a key feature that improved user engagement.",
-    "Collaborated with cross-functional teams to enhance UI/UX.",
-    "Fixed critical bugs, improving performance.",
-  ],
-};
+export const experiences = [
+  {
+    role: "Full Stack Developer",
+    company:"Maastrix Solutions",
+    duration: "Mar 2026 – Present",
+    description:
+      "Primarily focused on building scalable and efficient server-side systems using modern technologies, along with developing cross-platform mobile applications using React Native. Experienced in designing RESTful APIs, handling database operations, and ensuring seamless integration between frontend and backend systems. Adept at optimizing performance, debugging complex issues, and delivering robust, user-centric solutions in fast-paced development environments.",
+  },
+  {
+    role: "Machine Learning Intern",
+    company: "CodeAlpha",
+    duration: "Jan 2025 – Apr 2025",
+    description:
+      "Completed an ML internship where I built predictive models, performed data preprocessing, and evaluated performance using Python tools like Scikit-learn and Pandas. Also contributed to data visualization and collaborative project work.",
+  },
+  {
+    role: "Full Stack Development Intern",
+    company: "Unified Mentor",
+    duration: "Aug 2024 – Oct 2024",
+    description:
+      "Completed a Full Stack Development internship where I built and maintained web applications using technologies like React, Node.js, Express, and MongoDB. Worked on both frontend and backend, implemented APIs, and contributed to UI/UX improvements and database integration.",
+  },
+];

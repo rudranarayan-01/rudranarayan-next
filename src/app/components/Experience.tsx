@@ -1,35 +1,40 @@
 "use client";
 
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 
-const experiences = [
-  {
-    role: "Full Stack Developer",
-    company:"Maastrix Solutions",
-    duration: "Mar 2026 – Present",
-    description:
-      "Primarily focused on building scalable and efficient server-side systems using modern technologies, along with developing cross-platform mobile applications using React Native. Experienced in designing RESTful APIs, handling database operations, and ensuring seamless integration between frontend and backend systems. Adept at optimizing performance, debugging complex issues, and delivering robust, user-centric solutions in fast-paced development environments.",
-  },
-  {
-    role: "Machine Learning Intern",
-    company: "CodeAlpha",
-    duration: "Jan 2025 – Apr 2025",
-    description:
-      "Completed an ML internship where I built predictive models, performed data preprocessing, and evaluated performance using Python tools like Scikit-learn and Pandas. Also contributed to data visualization and collaborative project work.",
-  },
-  {
-    role: "Full Stack Development Intern",
-    company: "Unified Mentor",
-    duration: "Aug 2024 – Oct 2024",
-    description:
-      "Completed a Full Stack Development internship where I built and maintained web applications using technologies like React, Node.js, Express, and MongoDB. Worked on both frontend and backend, implemented APIs, and contributed to UI/UX improvements and database integration.",
-  },
-];
+interface Experience {
+  role: string;
+  company: string;
+  duration: string;
+  description: string;
+}
 
 export default function ExperienceSection() {
   const sectionRef = useRef<HTMLElement>(null);
+  const [experiences, setExperiences] = useState<Experience[]>([]);
+  const [loading, setLoading] = useState(true);
 
+  // 1. Fetch Dynamic Data from API
   useEffect(() => {
+    async function fetchExperiences() {
+      try {
+        const res = await fetch("/api/experiences", { cache: "no-store" });
+        const data = await res.json();
+        setExperiences(data);
+      } catch (err) {
+        console.error("Failed to load experiences:", err);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchExperiences();
+  }, []);
+
+  // 2. Attach IntersectionObserver once data is loaded & rendered
+  useEffect(() => {
+    if (loading || experiences.length === 0) return;
+
     const section = sectionRef.current;
     if (!section) return;
 
@@ -44,13 +49,13 @@ export default function ExperienceSection() {
           }
         });
       },
-      { threshold: 0.3 }
+      { threshold: 0.2 }
     );
 
     elements.forEach((el) => observer.observe(el));
 
     return () => observer.disconnect();
-  }, []);
+  }, [loading, experiences]);
 
   return (
     <section
@@ -66,25 +71,31 @@ export default function ExperienceSection() {
       </h2>
 
       <div className="relative flex flex-col gap-16 max-w-4xl mx-auto">
-        {experiences.map((exp, i) => (
-          <div
-            key={i}
-            className={`group relative bg-[#111] border border-gray-800 rounded-xl p-6 shadow-xl hover:shadow-blue-600/30 transition duration-300 overflow-hidden opacity-0 animate-on-scroll fade-up delay-${i}`}
-          >
-            <div className="absolute top-0 left-0 h-full w-1 animated-text-gradient rounded-full group-hover:scale-y-110 origin-top transition" />
-            <div className="pl-4">
-              <h3 className="text-2xl font-semibold animated-text-gradient group-hover:text-white transition">
-                {exp.role}
-              </h3>
-              <p className="text-sm text-gray-500 mt-1">
-                {exp.company} — {exp.duration}
-              </p>
-              <p className="mt-4 text-gray-300 leading-relaxed">
-                {exp.description}
-              </p>
-            </div>
+        {loading ? (
+          <div className="text-center text-neutral-500 font-mono text-xs py-10">
+            Loading experience data...
           </div>
-        ))}
+        ) : (
+          experiences.map((exp, i) => (
+            <div
+              key={i}
+              className={`group relative bg-[#111] border border-gray-800 rounded-xl p-6 shadow-xl hover:shadow-blue-600/30 transition duration-300 overflow-hidden opacity-0 animate-on-scroll fade-up delay-${i % 4}`}
+            >
+              <div className="absolute top-0 left-0 h-full w-1 animated-text-gradient rounded-full group-hover:scale-y-110 origin-top transition" />
+              <div className="pl-4">
+                <h3 className="text-2xl font-semibold animated-text-gradient group-hover:text-white transition">
+                  {exp.role}
+                </h3>
+                <p className="text-sm text-gray-500 mt-1">
+                  {exp.company} — {exp.duration}
+                </p>
+                <p className="mt-4 text-gray-300 leading-relaxed">
+                  {exp.description}
+                </p>
+              </div>
+            </div>
+          ))
+        )}
       </div>
 
       <style jsx>{`
