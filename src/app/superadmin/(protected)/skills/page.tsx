@@ -1,176 +1,151 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { skills as initialSkills } from "../../../data/data";
 
-interface SkillCategory {
-  category: string;
-  skills: { name: string; level: number }[];
+interface SkillItem {
+  name: string;
+  color?: string;
+  icon?: React.ComponentType<{ style?: React.CSSProperties }>;
 }
 
-const INITIAL_SKILLS: SkillCategory[] = [
-  {
-    category: "Languages & Core Frameworks",
-    skills: [
-      { name: "TypeScript", level: 90 },
-      { name: "Python", level: 85 },
-      { name: "React / Next.js", level: 92 },
-      { name: "Express.js", level: 88 },
-    ],
-  },
-  {
-    category: "Databases & Cloud Deployments",
-    skills: [
-      { name: "MongoDB / Mongoose", level: 85 },
-      { name: "SQLite", level: 80 },
-      { name: "Render", level: 82 },
-      { name: "Vite", level: 90 },
-    ],
-  },
-  {
-    category: "Computer Vision & Machine Learning",
-    skills: [
-      { name: "OpenCV", level: 80 },
-      { name: "YOLO Detection Models", level: 78 },
-    ],
-  },
-];
+export default function AdminSkillsPage() {
+  const [skillsList, setSkillsList] = useState<SkillItem[]>([]);
+  const [loading, setLoading] = useState(true);
 
-export default function SkillsPage() {
-  const [skillCategories, setSkillCategories] = useState<SkillCategory[]>(INITIAL_SKILLS);
-  const [newSkillName, setNewSkillName] = useState("");
-  const [newSkillCategory, setNewSkillCategory] = useState("Languages & Core Frameworks");
-  const [newSkillLevel, setNewSkillLevel] = useState(80);
+  // Form input states
+  const [name, setName] = useState("");
+  const [color, setColor] = useState("#38B2AC");
+  const [submitting, setSubmitting] = useState(false);
 
-  const handleAddSkill = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newSkillName.trim()) return;
+  useEffect(() => {
+    fetchSkills();
+  }, []);
 
-    setSkillCategories(
-      skillCategories.map((cat) => {
-        if (cat.category === newSkillCategory) {
-          return {
-            ...cat,
-            skills: [...cat.skills, { name: newSkillName.trim(), level: Number(newSkillLevel) }],
-          };
-        }
-        return cat;
-      })
-    );
-    setNewSkillName("");
+  const fetchSkills = async () => {
+    try {
+      const res = await fetch("/api/skills");
+      const data = await res.json();
+
+      const mappedSkills = data.map((item: { name: string; color: string }) => {
+        const match = initialSkills.find((s) => s.name === item.name);
+        return {
+          name: item.name,
+          color: item.color,
+          icon: match?.icon,
+        };
+      });
+
+      setSkillsList(mappedSkills);
+    } catch (error) {
+      console.error("Error fetching skills:", error);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleRemoveSkill = (catName: string, skillName: string) => {
-    setSkillCategories(
-      skillCategories.map((cat) => {
-        if (cat.category === catName) {
-          return {
-            ...cat,
-            skills: cat.skills.filter((s) => s.name !== skillName),
-          };
-        }
-        return cat;
-      })
-    );
+  const handleAddSkill = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!name.trim()) return;
+
+    setSubmitting(true);
+    try {
+      const res = await fetch("/api/skills", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: name.trim(), color }),
+      });
+
+      if (res.ok) {
+        setName("");
+        setColor("#38B2AC");
+        await fetchSkills();
+      }
+    } catch (error) {
+      console.error("Failed to add skill:", error);
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
-    <div className="space-y-8 pb-12 max-w-6xl">
-      {/* Header */}
-      <div className="border-b border-zinc-800/80 pb-6">
-        <h1 className="text-2xl font-bold text-white tracking-tight">Technical Stack & Skills</h1>
-        <p className="text-xs text-zinc-400 mt-1.5 font-mono">
-          Manage core competencies, proficiency metrics, and backend category groupings.
-        </p>
+    <div className="p-6 max-w-6xl mx-auto space-y-8">
+      {/* HEADER */}
+      <div className="border-b border-neutral-800 pb-4 flex justify-between items-center">
+        <div>
+          <h1 className="text-2xl font-bold text-white">Skills Dashboard</h1>
+          <p className="text-xs text-neutral-400 mt-1">
+            Manage dynamic skills list sourced from data.ts
+          </p>
+        </div>
+        <span className="text-xs font-mono px-3 py-1 bg-neutral-900 border border-neutral-800 rounded-full text-emerald-500">
+          Total Skills: {skillsList.length}
+        </span>
       </div>
 
-      {/* Add Skill Quick Form */}
-      <form onSubmit={handleAddSkill} className="p-5 bg-zinc-950/80 border border-zinc-800/80 rounded-2xl space-y-4">
-        <h2 className="text-xs font-mono uppercase tracking-wider text-white font-bold">
-          Quick Add Skill
-        </h2>
-        <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
+      {/* CREATE NEW SKILL FORM */}
+      <div className="bg-neutral-900/80 border border-neutral-800 rounded-2xl p-5 max-w-xl">
+        <h2 className="text-sm font-semibold text-emerald-500 mb-4">Add New Skill</h2>
+        <form onSubmit={handleAddSkill} className="flex flex-col sm:flex-row gap-3">
           <input
             type="text"
-            placeholder="Skill (e.g. Tailwind CSS)"
-            value={newSkillName}
-            onChange={(e) => setNewSkillName(e.target.value)}
-            className="px-3.5 py-2 bg-zinc-900 border border-zinc-800 rounded-xl text-xs text-white placeholder-zinc-500 focus:outline-none focus:border-zinc-700 font-mono"
+            placeholder="Skill Name (e.g. Docker)"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            className="flex-1 px-4 py-2 bg-neutral-950 border border-neutral-800 rounded-xl text-sm text-white focus:outline-none focus:border-neutral-600"
+            required
           />
-
-          <select
-            value={newSkillCategory}
-            onChange={(e) => setNewSkillCategory(e.target.value)}
-            className="px-3.5 py-2 bg-zinc-900 border border-zinc-800 rounded-xl text-xs text-zinc-300 focus:outline-none focus:border-zinc-700 font-mono"
-          >
-            {skillCategories.map((c) => (
-              <option key={c.category} value={c.category}>
-                {c.category}
-              </option>
-            ))}
-          </select>
-
-          <div className="flex items-center gap-3 bg-zinc-900 border border-zinc-800 px-3 py-2 rounded-xl">
-            <span className="text-[10px] font-mono text-zinc-400">Level:</span>
+          <div className="flex items-center gap-2 bg-neutral-950 border border-neutral-800 px-3 py-2 rounded-xl">
             <input
-              type="range"
-              min="10"
-              max="100"
-              value={newSkillLevel}
-              onChange={(e) => setNewSkillLevel(Number(e.target.value))}
-              className="w-full accent-white"
+              type="color"
+              value={color}
+              onChange={(e) => setColor(e.target.value)}
+              className="w-6 h-6 rounded bg-transparent cursor-pointer border-0"
             />
-            <span className="text-xs font-mono text-white font-semibold w-8">{newSkillLevel}%</span>
+            <span className="text-xs font-mono text-neutral-400">{color}</span>
           </div>
-
           <button
             type="submit"
-            className="px-4 py-2 bg-white text-black text-xs font-semibold rounded-xl hover:bg-zinc-200 transition-colors"
+            disabled={submitting}
+            className="px-5 py-2 bg-white hover:bg-neutral-200 text-black font-medium text-sm rounded-xl transition disabled:opacity-50"
           >
-            + Add Competency
+            {submitting ? "Adding..." : "Add"}
           </button>
-        </div>
-      </form>
-
-      {/* Categories Showcase */}
-      <div className="space-y-6">
-        {skillCategories.map((catGroup) => (
-          <div key={catGroup.category} className="p-6 bg-zinc-950/80 border border-zinc-800/80 rounded-2xl space-y-5">
-            <h3 className="text-xs font-mono uppercase tracking-wider text-emerald-400 font-bold">
-              {catGroup.category}
-            </h3>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {catGroup.skills.map((skill) => (
-                <div
-                  key={skill.name}
-                  className="p-3.5 bg-zinc-900/60 border border-zinc-800/60 rounded-xl space-y-2 group hover:border-zinc-700/60 transition-colors"
-                >
-                  <div className="flex items-center justify-between text-xs">
-                    <span className="font-semibold text-white">{skill.name}</span>
-                    <div className="flex items-center gap-3">
-                      <span className="font-mono text-zinc-400 text-[11px]">{skill.level}%</span>
-                      <button
-                        onClick={() => handleRemoveSkill(catGroup.category, skill.name)}
-                        className="text-zinc-600 hover:text-red-400 transition-colors"
-                        title="Remove Skill"
-                      >
-                        ✕
-                      </button>
-                    </div>
-                  </div>
-
-                  <div className="w-full bg-zinc-800 h-1.5 rounded-full overflow-hidden">
-                    <div
-                      className="bg-white h-full transition-all duration-500"
-                      style={{ width: `${skill.level}%` }}
-                    />
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        ))}
+        </form>
       </div>
+
+      {/* SKILLS DISPLAY GRID */}
+      {loading ? (
+        <div className="text-neutral-500 text-sm font-mono py-12 text-center">
+          Loading skills...
+        </div>
+      ) : (
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
+          {skillsList.map((skill, index) => {
+            const Icon = skill.icon;
+            return (
+              <div
+                key={index}
+                className="flex items-center gap-3 p-3 bg-neutral-900/60 border border-neutral-800 rounded-xl hover:border-neutral-700 transition"
+              >
+                {Icon ? (
+                  <span className="text-2xl">
+                    <Icon style={{ color: skill.color }} />
+                  </span>
+                ) : (
+                  <div
+                    className="w-3.5 h-3.5 rounded-full shrink-0"
+                    style={{ backgroundColor: skill.color || "#fff" }}
+                  />
+                )}
+                <span className="text-sm font-medium text-neutral-200 truncate">
+                  {skill.name}
+                </span>
+              </div>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }

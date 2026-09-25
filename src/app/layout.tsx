@@ -1,8 +1,15 @@
 import type { Metadata } from "next";
-import { Outfit } from "next/font/google";
+import { Outfit, Geist } from "next/font/google";
 import "./globals.css";
 import React from 'react';
 import PublicDecorators from "./components/PublicDecorators";
+import { cn } from "@/lib/utils";
+import { Toaster } from "@/components/ui/sonner"
+
+const geist = Geist({subsets:['latin'],variable:'--font-sans'});
+
+
+// import {Toaster} from "sonner"
 
 const outfit = Outfit({
   subsets: ["latin"],
@@ -55,9 +62,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" className={cn("font-sans", geist.variable)}>
       <body className={`${outfit.variable} antialiased`}>
         <PublicDecorators />
+        <Toaster position="top-right" richColors />
         {children}
       </body>
     </html>
