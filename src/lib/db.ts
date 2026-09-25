@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import mongoose from "mongoose";
 
 const MONGODB_URI = process.env.MONGODB_URI;
@@ -12,7 +13,6 @@ interface MongooseCache {
 }
 
 declare global {
-  // eslint-disable-next-line no-var
   var mongoose: MongooseCache | undefined;
 }
 
@@ -33,7 +33,8 @@ async function connectDB() {
   if (!cached.promise) {
     console.log("🔄 Connecting to MongoDB...");
 
-    cached.promise = mongoose.connect(MONGODB_URI, {
+    // Added non-null assertion operator (!) to resolve TS2345 error
+    cached.promise = mongoose.connect(MONGODB_URI!, {
       dbName: "portfolio",
       family: 4,
       serverSelectionTimeoutMS: 10000,
