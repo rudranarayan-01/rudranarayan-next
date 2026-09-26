@@ -4,14 +4,18 @@ import React, { useEffect, useState, useMemo } from "react";
 import {
   FiPlus,
   FiClock,
-
   FiSearch,
   FiCode,
   FiCheckCircle,
   FiAlertCircle,
   FiRefreshCw,
   FiTool,
+  FiEdit2,
+  FiTrash2,
+  FiX,
+  FiCheck,
 } from "react-icons/fi";
+import { toast } from "sonner";
 
 interface ProjectOption {
   _id: string;
@@ -44,6 +48,12 @@ export default function WorkTrackerPage() {
   const [hours, setHours] = useState<number>(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  // Edit Mode State
+  const [editingLogId, setEditingLogId] = useState<string | null>(null);
+
+  // Deleting State (for per-card loader feedback)
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+
   // Filter & Search State
   const [filterProject, setFilterProject] = useState("ALL");
   const [filterType, setFilterType] = useState("ALL");
@@ -65,16 +75,46 @@ export default function WorkTrackerPage() {
 
       setProjects(Array.isArray(projData) ? projData : projData.data || []);
       setLogs(Array.isArray(logsData) ? logsData : logsData.data || []);
-    } catch (err) {
+    } catch (err: any) {
       console.error("Failed to load tracker data:", err);
+      toast.error("Failed to load work tracker data");
     } finally {
       setLoading(false);
     }
   };
 
+  // Reset form fields
+  const resetForm = () => {
+    setSelectedProject("");
+    setLogType("feature");
+    setTitle("");
+    setDetails("");
+    setTechInput("");
+    setHours(1);
+    setEditingLogId(null);
+  };
+
+  // Populate form with existing log data for editing
+  const handleStartEdit = (log: WorkLog) => {
+    setEditingLogId(log._id);
+    setSelectedProject(log.projectId?._id || "");
+    setLogType(log.logType);
+    setTitle(log.title);
+    setDetails(log.details || "");
+    setTechInput(log.techStackUsed ? log.techStackUsed.join(", ") : "");
+    setHours(log.hoursSpent || 1);
+    
+    // Scroll smoothly to top form on mobile/desktop
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  // Submit Create or Update
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!selectedProject || !title) return;
+    if (!selectedProject || !title) {
+      toast.error("Please select a project and enter a title");
+      return;
+    }
 
     setIsSubmitting(true);
     const techStackUsed = techInput
@@ -82,32 +122,92 @@ export default function WorkTrackerPage() {
       .map((t) => t.trim())
       .filter(Boolean);
 
+    const payload = {
+      projectId: selectedProject,
+      logType,
+      title,
+      details,
+      techStackUsed,
+      hoursSpent: Number(hours),
+      date: new Date(),
+    };
+
     try {
-      const res = await fetch("/api/admin/worklogs", {
-        method: "POST",
+      const isEditing = Boolean(editingLogId);
+      const endpoint = isEditing
+        ? `/api/admin/worklogs/${editingLogId}`
+        : "/api/admin/worklogs";
+      const method = isEditing ? "PUT" : "POST";
+
+      const res = await fetch(endpoint, {
+        method,
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          projectId: selectedProject,
-          logType,
-          title,
-          details,
-          techStackUsed,
-          hoursSpent: Number(hours),
-          date: new Date(),
-        }),
+        body: JSON.stringify(payload),
       });
 
-      if (res.ok) {
-        setTitle("");
-        setDetails("");
-        setTechInput("");
-        setHours(1);
-        fetchInitialData();
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || "Operation failed");
       }
-    } catch (err) {
-      console.error("Failed to create log:", err);
+
+      toast.success(
+        isEditing ? "Work log updated successfully!" : "Work log saved successfully!"
+      );
+
+      resetForm();
+      fetchInitialData();
+    } catch (err: any) {
+      console.error("Failed to save log:", err);
+      toast.error(err.message || "Failed to save work log");
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  // Trigger Sonner Confirmation Toast for Delete
+  const confirmDelete = (id: string, logTitle: string) => {
+    toast(`Delete "${logTitle}"?`, {
+      description: "This action cannot be undone.",
+      action: {
+        label: "Delete",
+        onClick: () => executeDelete(id),
+      },
+      cancel: {
+        label: "Cancel",
+        onClick: () => {},
+      },
+    });
+  };
+
+  // Execute DELETE API call
+  const executeDelete = async (id: string) => {
+    setDeletingId(id);
+    try {
+      const res = await fetch(`/api/admin/worklogs/${id}`, {
+        method: "DELETE",
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || "Failed to delete log");
+      }
+
+      toast.success("Work log deleted successfully");
+      
+      // If currently editing this item, clear the form
+      if (editingLogId === id) {
+        resetForm();
+      }
+
+      // Optimistically filter state & re-fetch
+      setLogs((prev) => prev.filter((l) => l._id !== id));
+    } catch (err: any) {
+      console.error("Failed to delete log:", err);
+      toast.error(err.message || "Failed to delete work log");
+    } finally {
+      setDeletingId(null);
     }
   };
 
@@ -210,10 +310,30 @@ export default function WorkTrackerPage() {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* TASK LOGGING FORM */}
-        <div className="bg-[#0c0c0e] border border-neutral-800/80 rounded-2xl p-6 space-y-4 h-fit">
-          <h2 className="text-sm font-bold text-neutral-200 flex items-center gap-2">
-            <FiPlus className="text-emerald-400" /> Log Work Item
-          </h2>
+        <div className="bg-[#0c0c0e] border border-neutral-800/80 rounded-2xl p-6 space-y-4 h-fit sticky top-6">
+          <div className="flex items-center justify-between">
+            <h2 className="text-sm font-bold text-neutral-200 flex items-center gap-2">
+              {editingLogId ? (
+                <>
+                  <FiEdit2 className="text-amber-400" /> Edit Work Item
+                </>
+              ) : (
+                <>
+                  <FiPlus className="text-emerald-400" /> Log Work Item
+                </>
+              )}
+            </h2>
+
+            {editingLogId && (
+              <button
+                onClick={resetForm}
+                type="button"
+                className="text-[11px] font-mono text-neutral-400 hover:text-white flex items-center gap-1 bg-neutral-900 border border-neutral-800 px-2 py-1 rounded-lg transition"
+              >
+                <FiX className="w-3 h-3" /> Cancel
+              </button>
+            )}
+          </div>
 
           <form onSubmit={handleSubmit} className="space-y-4 text-xs">
             <div>
@@ -301,11 +421,20 @@ export default function WorkTrackerPage() {
             <button
               type="submit"
               disabled={isSubmitting}
-              className="w-full py-2.5 bg-white text-black font-semibold rounded-xl hover:bg-neutral-200 transition disabled:opacity-50 flex items-center justify-center gap-2"
+              className={`w-full py-2.5 font-semibold rounded-xl transition disabled:opacity-50 flex items-center justify-center gap-2 ${
+                editingLogId
+                  ? "bg-amber-400 text-black hover:bg-amber-300"
+                  : "bg-white text-black hover:bg-neutral-200"
+              }`}
             >
               {isSubmitting ? (
                 <>
-                  <FiRefreshCw className="animate-spin" /> Saving Log...
+                  <FiRefreshCw className="animate-spin" />
+                  {editingLogId ? "Updating Log..." : "Saving Log..."}
+                </>
+              ) : editingLogId ? (
+                <>
+                  <FiCheck /> Update Work Log
                 </>
               ) : (
                 "Save Work Log"
@@ -367,58 +496,97 @@ export default function WorkTrackerPage() {
               No work logs matching the criteria.
             </div>
           ) : (
-            filteredLogs.map((log) => (
-              <div
-                key={log._id}
-                className="p-5 bg-[#0c0c0e] border border-neutral-800/80 rounded-2xl space-y-3 hover:border-neutral-700 transition"
-              >
-                <div className="flex justify-between items-start">
-                  <div>
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <span className="text-sm font-bold text-white">{log.title}</span>
-                      <span
-                        className={`text-[10px] font-mono px-2 py-0.5 rounded border uppercase ${getTypeBadgeStyle(
-                          log.logType
-                        )}`}
-                      >
-                        {log.logType}
-                      </span>
+            filteredLogs.map((log) => {
+              const isCurrentlyEditing = editingLogId === log._id;
+              const isCurrentlyDeleting = deletingId === log._id;
+
+              return (
+                <div
+                  key={log._id}
+                  className={`p-5 bg-[#0c0c0e] border rounded-2xl space-y-3 transition ${
+                    isCurrentlyEditing
+                      ? "border-amber-500/50 bg-amber-500/5"
+                      : "border-neutral-800/80 hover:border-neutral-700"
+                  }`}
+                >
+                  <div className="flex justify-between items-start gap-4">
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="text-sm font-bold text-white">
+                          {log.title}
+                        </span>
+                        <span
+                          className={`text-[10px] font-mono px-2 py-0.5 rounded border uppercase ${getTypeBadgeStyle(
+                            log.logType
+                          )}`}
+                        >
+                          {log.logType}
+                        </span>
+                      </div>
+                      <p className="text-xs text-neutral-400">
+                        Project:{" "}
+                        <span className="text-neutral-200 font-medium">
+                          {log.projectId?.name || "Unassigned"}
+                        </span>
+                      </p>
                     </div>
-                    <p className="text-xs text-neutral-400 mt-1">
-                      Project:{" "}
-                      <span className="text-neutral-200 font-medium">
-                        {log.projectId?.name || "Unassigned"}
-                      </span>
+
+                    <div className="flex items-center gap-3">
+                      <div className="text-right">
+                        <span className="text-xs font-mono text-emerald-400 block font-semibold">
+                          {log.hoursSpent} hrs
+                        </span>
+                        <span className="text-[10px] font-mono text-neutral-500 block">
+                          {new Date(log.date).toLocaleDateString()}
+                        </span>
+                      </div>
+
+                      {/* EDIT & DELETE ACTION BUTTONS */}
+                      <div className="flex items-center gap-1 border-l border-neutral-800 pl-3">
+                        <button
+                          onClick={() => handleStartEdit(log)}
+                          title="Edit Log"
+                          className="p-1.5 rounded-lg text-neutral-400 hover:text-amber-400 hover:bg-neutral-800 transition"
+                        >
+                          <FiEdit2 className="w-3.5 h-3.5" />
+                        </button>
+                        <button
+                          onClick={() => confirmDelete(log._id, log.title)}
+                          disabled={isCurrentlyDeleting}
+                          title="Delete Log"
+                          className="p-1.5 rounded-lg text-neutral-400 hover:text-rose-400 hover:bg-neutral-800 transition disabled:opacity-50"
+                        >
+                          {isCurrentlyDeleting ? (
+                            <FiRefreshCw className="w-3.5 h-3.5 animate-spin" />
+                          ) : (
+                            <FiTrash2 className="w-3.5 h-3.5" />
+                          )}
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
+                  {log.details && (
+                    <p className="text-xs text-neutral-300 leading-relaxed">
+                      {log.details}
                     </p>
-                  </div>
-                  <div className="text-right">
-                    <span className="text-xs font-mono text-emerald-400 block font-semibold">
-                      {log.hoursSpent} hrs
-                    </span>
-                    <span className="text-[10px] font-mono text-neutral-500 block">
-                      {new Date(log.date).toLocaleDateString()}
-                    </span>
-                  </div>
+                  )}
+
+                  {log.techStackUsed?.length > 0 && (
+                    <div className="flex gap-1.5 flex-wrap pt-1">
+                      {log.techStackUsed.map((tech, i) => (
+                        <span
+                          key={i}
+                          className="text-[10px] font-mono px-2 py-0.5 bg-neutral-900 border border-neutral-800 text-neutral-400 rounded"
+                        >
+                          {tech}
+                        </span>
+                      ))}
+                    </div>
+                  )}
                 </div>
-
-                {log.details && (
-                  <p className="text-xs text-neutral-300 leading-relaxed">{log.details}</p>
-                )}
-
-                {log.techStackUsed?.length > 0 && (
-                  <div className="flex gap-1.5 flex-wrap pt-1">
-                    {log.techStackUsed.map((tech, i) => (
-                      <span
-                        key={i}
-                        className="text-[10px] font-mono px-2 py-0.5 bg-neutral-900 border border-neutral-800 text-neutral-400 rounded"
-                      >
-                        {tech}
-                      </span>
-                    ))}
-                  </div>
-                )}
-              </div>
-            ))
+              );
+            })
           )}
         </div>
       </div>
