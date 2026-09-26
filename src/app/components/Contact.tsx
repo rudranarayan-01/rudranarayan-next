@@ -12,7 +12,8 @@ const Contact = React.forwardRef<HTMLElement, unknown>((_, ref) => {
   const sectionRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
-    const elements = sectionRef.current?.querySelectorAll(".animate-on-scroll") || [];
+    const elements =
+      sectionRef.current?.querySelectorAll(".animate-on-scroll") || [];
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
@@ -36,7 +37,7 @@ const Contact = React.forwardRef<HTMLElement, unknown>((_, ref) => {
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     if (loading) return;
-    const form = e.target as HTMLFormElement;
+    const form = e.currentTarget;
     const email = form.email.value;
     const message = form.message.value;
 
@@ -52,23 +53,49 @@ const Contact = React.forwardRef<HTMLElement, unknown>((_, ref) => {
       return;
     } else setMessageError("");
 
-    const formData = {
+    // Web3Forms payload
+    const web3FormsData = {
       access_key: "bd1d1906-eba0-4e6f-b130-de1dc7542475",
+      email,
+      message,
+    };
+
+    // Internal MongoDB API payload
+    const dbPayload = {
+      name: email.split("@")[0], // Extract default name from email handle
       email,
       message,
     };
 
     try {
       setLoading(true);
-      const response = await fetch("https://api.web3forms.com/submit", {
-        method: "POST",
-        headers: { "Content-Type": "application/json", Accept: "application/json" },
-        body: JSON.stringify(formData),
-      });
 
-      const result = await response.json();
-      setStatus(result.success ? "Message sent successfully!" : "Error sending message.");
-      if (result.success) form.reset();
+      // Execute both API calls in parallel
+      const [web3Res, dbRes] = await Promise.all([
+        fetch("https://api.web3forms.com/submit", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+          body: JSON.stringify(web3FormsData),
+        }),
+        fetch("/api/contact", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(dbPayload),
+        }),
+      ]);
+
+      const web3Result = await web3Res.json();
+      const dbResult = await dbRes.json();
+
+      if (web3Result.success || dbResult.success) {
+        setStatus("Message sent successfully!");
+        form.reset();
+      } else {
+        setStatus("Error sending message. Please try again.");
+      }
     } catch {
       setStatus("Something went wrong. Please try again.");
     } finally {
@@ -82,7 +109,8 @@ const Contact = React.forwardRef<HTMLElement, unknown>((_, ref) => {
       ref={(node) => {
         sectionRef.current = node;
         if (typeof ref === "function") ref(node);
-        else if (ref) (ref as React.MutableRefObject<HTMLElement | null>).current = node;
+        else if (ref)
+          (ref as React.MutableRefObject<HTMLElement | null>).current = node;
       }}
       className="bg-neutral-950 flex flex-col justify-center items-center text-neutral-100 py-16 px-6"
     >
@@ -125,7 +153,9 @@ const Contact = React.forwardRef<HTMLElement, unknown>((_, ref) => {
               className="w-full px-4 py-3 border placeholder:text-sm bg-neutral-900 border-neutral-600 rounded-lg focus:outline-none"
               required
             />
-            {emailError && <p className="text-red-500 text-xs">{emailError}</p>}
+            {emailError && (
+              <p className="text-red-500 text-xs">{emailError}</p>
+            )}
           </div>
           <div className="opacity-0 animate-on-scroll fade-up delay-300">
             <textarea
@@ -135,18 +165,21 @@ const Contact = React.forwardRef<HTMLElement, unknown>((_, ref) => {
               className="w-full px-4 py-3 border placeholder:text-sm bg-neutral-900 border-neutral-600 rounded-lg focus:outline-none resize-none"
               required
             />
-            {messageError && <p className="text-red-500 text-xs">{messageError}</p>}
+            {messageError && (
+              <p className="text-red-500 text-xs">{messageError}</p>
+            )}
           </div>
           <button
             type="submit"
-            className="w-full bg-neutral-950 cursor-pointer px-4 py-2 rounded-lg text-sm font-medium border border-neutral-600 flex justify-center transform transition-transform hover:scale-[1.01] opacity-0 animate-on-scroll fade-up delay-400"
+            disabled={loading}
+            className="w-full bg-neutral-950 cursor-pointer px-4 py-2 rounded-lg text-sm font-medium border border-neutral-600 flex justify-center transform transition-transform hover:scale-[1.01] opacity-0 animate-on-scroll fade-up delay-400 disabled:opacity-50"
           >
             {loading ? "Sending..." : "Send Message"}
           </button>
         </form>
 
         {status && (
-          <p className="mt-4 text-center text-sm font-medium text-blue-600">
+          <p className="mt-4 text-center text-sm font-medium text-emerald-400">
             {status}
           </p>
         )}
