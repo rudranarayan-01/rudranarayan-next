@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useEffect } from "react";
 import { HiOutlineArrowDown } from "react-icons/hi";
 import { motion } from "motion/react";
 import { fadeInDown, fadeInUp } from "../data/variants";
@@ -7,6 +7,14 @@ import { FaLinkedinIn } from "react-icons/fa";
 import { TimezoneWidget } from "./TimezoneWidget";
 
 const Hero = React.forwardRef<HTMLElement, unknown>((_, ref) => {
+  useEffect(() => {
+    fetch("/api/admin/track-visit", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ path: window.location.pathname }),
+    }).catch((err) => console.error("Tracking error:", err));
+  }, []);
+  
   return (
     <main
       ref={ref}
