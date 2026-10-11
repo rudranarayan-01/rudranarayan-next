@@ -58,10 +58,28 @@ export async function GET() {
   try {
     const payments = await Payment.find()
       .populate("projectId", "name clientInfo")
-      .populate("tasksCovered", "title hoursSpent logType")
+      .populate(
+        "tasksCovered",
+        "title logType details techStackUsed hoursSpent date createdAt"
+      )
       .sort({ createdAt: -1 });
 
-    return NextResponse.json({ payments }, { status: 200 });
+    // Optional: Transform the output slightly if `date` needs fallback to `createdAt`
+    const formattedPayments = payments.map((payment: any) => {
+      const paymentObj = payment.toObject();
+      paymentObj.tasksCovered = paymentObj.tasksCovered.map((task: any) => ({
+        _id: task._id,
+        date: task.date || task.createdAt || payment.createdAt,
+        logType: task.logType || "feature",
+        title: task.title,
+        details: task.details || "No details provided.",
+        techStackUsed: task.techStackUsed || [],
+        hoursSpent: task.hoursSpent || 0,
+      }));
+      return paymentObj;
+    });
+
+    return NextResponse.json({ payments: formattedPayments }, { status: 200 });
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
