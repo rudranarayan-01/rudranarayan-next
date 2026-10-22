@@ -13,6 +13,13 @@ interface ClientInfo {
   company: string;
 }
 
+interface ArchitectureStep {
+  stepNumber: number;
+  title: string;
+  description: string;
+  techUsed: string[];
+}
+
 interface ProjectItem {
   _id?: string;
   name: string;
@@ -24,6 +31,7 @@ interface ProjectItem {
   clientInfo?: ClientInfo;
   links: ProjectLink[];
   techStack: string[];
+  architectureFlow?: ArchitectureStep[];
 }
 
 export default function AdminProjectsPage() {
@@ -43,6 +51,7 @@ export default function AdminProjectsPage() {
     clientCompany: "",
     linksText: "",
     techStackText: "",
+    architectureText: "", // Format: Title | Description | Tech1, Tech2 (one step per line)
   });
 
   useEffect(() => {
@@ -65,6 +74,19 @@ export default function AdminProjectsPage() {
   const handleOpenModal = (project?: ProjectItem) => {
     if (project) {
       setEditingSlug(project.slug || null);
+      
+      // Format existing architectureFlow into clean editable text lines
+      const archFormatted = project.architectureFlow
+        ? project.architectureFlow
+            .map(
+              (step) =>
+                `${step.title} | ${step.description} | ${
+                  step.techUsed ? step.techUsed.join(", ") : ""
+                }`
+            )
+            .join("\n")
+        : "";
+
       setForm({
         name: project.name,
         slug: project.slug,
@@ -78,6 +100,7 @@ export default function AdminProjectsPage() {
           ? project.links.map((l) => `${l.label}: ${l.url}`).join("\n")
           : "",
         techStackText: project.techStack ? project.techStack.join(", ") : "",
+        architectureText: archFormatted,
       });
     } else {
       setEditingSlug(null);
@@ -92,6 +115,7 @@ export default function AdminProjectsPage() {
         clientCompany: "",
         linksText: "",
         techStackText: "",
+        architectureText: "",
       });
     }
     setIsModalOpen(true);
@@ -117,24 +141,47 @@ export default function AdminProjectsPage() {
       .map((t) => t.trim())
       .filter(Boolean);
 
+    // Parse architecture pipeline text lines into structured objects
+    const parsedArchitecture: ArchitectureStep[] = form.architectureText
+      .split("\n")
+      .map((line, index) => {
+        if (!line.trim()) return null;
+        const parts = line.split("|").map((p) => p.trim());
+        const title = parts[0] || `Phase ${index + 1}`;
+        const description = parts[1] || "";
+        const techUsed = parts[2]
+          ? parts[2].split(",").map((t) => t.trim()).filter(Boolean)
+          : [];
+
+        return {
+          stepNumber: index + 1,
+          title,
+          description,
+          techUsed,
+        };
+      })
+      .filter(Boolean) as ArchitectureStep[];
+
     const payload = {
       name: form.name,
       slug: form.slug || form.name.toLowerCase().replace(/[^a-z0-9]+/g, "-"),
       description: form.description,
       longDescription: form.longDescription,
       status: form.status,
-      thumbnailUrl: form.thumbnailUrl || "https://images.unsplash.com/photo-1581092335397-9583fe92d232?q=80&w=1200&auto=format&fit=crop",
+      thumbnailUrl:
+        form.thumbnailUrl ||
+        "https://images.unsplash.com/photo-1581092335397-9583fe92d232?q=80&w=1200&auto=format&fit=crop",
       clientInfo: {
         name: form.clientName,
         company: form.clientCompany,
       },
       links: parsedLinks,
       techStack: parsedTechStack,
+      architectureFlow: parsedArchitecture,
     };
 
     try {
       if (editingSlug) {
-        // Update via slug endpoint
         const res = await fetch(`/api/projects/${editingSlug}`, {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
@@ -148,7 +195,6 @@ export default function AdminProjectsPage() {
           toast.error(json.error || "Failed to update project.");
         }
       } else {
-        // Create new project
         const res = await fetch("/api/projects", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -196,7 +242,7 @@ export default function AdminProjectsPage() {
         <div>
           <h1 className="text-xl font-bold text-white">Project Showcase Control</h1>
           <p className="text-xs text-zinc-400 mt-1 font-mono">
-            Manage deployments, client info, links, and telemetry specs.
+            Manage deployments, client info, architecture pipelines, and specs.
           </p>
         </div>
         <button
@@ -248,6 +294,12 @@ export default function AdminProjectsPage() {
                 ))}
               </div>
 
+              {item.architectureFlow && item.architectureFlow.length > 0 && (
+                <p className="text-[10px] font-mono text-amber-400">
+                  ⚙️ Architecture Pipeline: {item.architectureFlow.length} Phases configured
+                </p>
+              )}
+
               <div className="flex gap-4 text-[11px] font-mono text-emerald-400 pt-2 border-t border-zinc-900">
                 <a href={`/projects/${item.slug}`} target="_blank" rel="noreferrer" className="underline hover:text-emerald-300">
                   View Specs Page ↗
@@ -261,7 +313,7 @@ export default function AdminProjectsPage() {
       {/* Modal Form */}
       {isModalOpen && (
         <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-zinc-950 border border-zinc-800 rounded-2xl w-full max-w-lg p-6 space-y-4 shadow-2xl max-h-[90vh] overflow-y-auto">
+          <div className="bg-zinc-950 border border-zinc-800 rounded-2xl w-full max-w-xl p-6 space-y-4 shadow-2xl max-h-[90vh] overflow-y-auto">
             <h3 className="text-xs font-mono font-bold text-white uppercase tracking-wider">
               {editingSlug !== null ? "Edit Deployment Record" : "Add New Deployment Record"}
             </h3>
@@ -352,6 +404,20 @@ export default function AdminProjectsPage() {
                 onChange={(e) => setForm({ ...form, techStackText: e.target.value })}
                 className="w-full px-3 py-2 bg-zinc-900 border border-zinc-800 rounded-xl text-white focus:outline-none"
               />
+
+              {/* Architecture Pipeline Field */}
+              <div className="space-y-1">
+                <label className="text-[10px] font-mono text-amber-400 uppercase tracking-widest block">
+                  Architecture Pipeline (Format: Title | Description | Tech1, Tech2)
+                </label>
+                <textarea
+                  rows={4}
+                  placeholder="Phase Title | Step breakdown description | Next.js, TypeScript"
+                  value={form.architectureText}
+                  onChange={(e) => setForm({ ...form, architectureText: e.target.value })}
+                  className="w-full px-3 py-2 bg-zinc-900 border border-zinc-800 rounded-xl text-white focus:outline-none resize-none font-mono text-[11px]"
+                />
+              </div>
 
               <div className="flex justify-end gap-2 pt-3 border-t border-zinc-900">
                 <button
