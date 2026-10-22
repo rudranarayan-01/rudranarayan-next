@@ -20,7 +20,9 @@ import {
   FiTrash2,
   FiX,
   FiSave,
+  FiDownload,
 } from "react-icons/fi";
+import { downloadWorkLogExcel } from "@/lib/exportWorkLog";
 
 interface Project {
   _id: string;
@@ -30,15 +32,22 @@ interface Project {
 
 interface WorkLog {
   _id: string;
+  date?: string;              
   title: string;
+  details?: string;          
   hoursSpent: number;
   logType?: string;
+  techStackUsed?: string[];   
   paymentId: string | null;
 }
 
 interface PaymentRecord {
   _id: string;
-  projectId: { _id: string; name: string } | null;
+  projectId: {
+    _id: string;
+    name: string;
+    clientInfo?: { name?: string | null; company?: string | null };
+  } | null;
   amount: number;
   currency: string;
   status: "pending" | "paid" | "partially-paid";
@@ -73,6 +82,7 @@ export default function PaymentsPage() {
   const [endDate, setEndDate] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [downloadingId, setDownloadingId] = useState<string | null>(null);
 
   // Filters & Search State
   const [searchQuery, setSearchQuery] = useState("");
@@ -81,6 +91,23 @@ export default function PaymentsPage() {
 
   // Expanded Row State
   const [expandedPaymentId, setExpandedPaymentId] = useState<string | null>(null);
+
+  const handleDownloadExcel = async (payment: PaymentRecord) => {
+    if (!payment.tasksCovered?.length) {
+      toast.warning("No tasks to export for this payment.");
+      return;
+    }
+    try {
+      setDownloadingId(payment._id);
+      await downloadWorkLogExcel(payment);
+      toast.success("Work report downloaded!");
+    } catch (err) {
+      console.error("Excel export failed:", err);
+      toast.error("Failed to generate Excel file.");
+    } finally {
+      setDownloadingId(null);
+    }
+  };
 
   useEffect(() => {
     fetchInitialData();
@@ -562,6 +589,19 @@ export default function PaymentsPage() {
                                   <FiRefreshCw className="animate-spin w-3.5 h-3.5" />
                                 ) : (
                                   <FiTrash2 className="w-3.5 h-3.5" />
+                                )}
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => handleDownloadExcel(p)}
+                                disabled={downloadingId === p._id}
+                                title="Download Work Report (Excel)"
+                                className="p-1.5 text-sky-400 hover:text-sky-300 rounded-lg bg-sky-500/10 border border-sky-500/20 hover:bg-sky-500/20 transition disabled:opacity-50"
+                              >
+                                {downloadingId === p._id ? (
+                                  <FiRefreshCw className="animate-spin w-3.5 h-3.5" />
+                                ) : (
+                                  <FiDownload className="w-3.5 h-3.5" />
                                 )}
                               </button>
                               <button

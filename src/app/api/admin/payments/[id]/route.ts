@@ -22,7 +22,10 @@ export async function GET(req: NextRequest, { params }: RouteParams) {
 
     const payment = await Payment.findById(id)
       .populate("projectId", "name type")
-      .populate("tasksCovered");
+      .populate(
+        "tasksCovered",
+        "title logType details techStackUsed hoursSpent date createdAt"
+      );
 
     if (!payment) {
       return NextResponse.json(
@@ -67,7 +70,10 @@ export async function PUT(req: NextRequest, { params }: RouteParams) {
       { new: true, runValidators: true }
     )
       .populate("projectId", "name type")
-      .populate("tasksCovered");
+      .populate(
+        "tasksCovered",
+        "title logType details techStackUsed hoursSpent date createdAt"
+      );
 
     if (!updatedPayment) {
       return NextResponse.json(
