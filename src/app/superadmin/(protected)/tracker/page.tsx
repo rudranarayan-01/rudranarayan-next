@@ -347,7 +347,7 @@ export default function WorkTrackerPage() {
                 <option value="">Select Target Project</option>
                 {projects.map((p) => (
                   <option key={p._id} value={p._id}>
-                    {p.name} ({p.type})
+                    {p.name}
                   </option>
                 ))}
               </select>
