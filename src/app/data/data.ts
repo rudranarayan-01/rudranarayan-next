@@ -92,6 +92,7 @@ export const navbarData: NavbarItem[] = [
 export const projects = [
   {
     name: "HouseXpertz",
+    slug: "housexpertz",
     description: "HouseXpertz is a handyman service platform connecting users with professionals. Integrated AI chatbot provides service-based responses and improves customer interaction experience.",
     points: [
       "AI chatbot suggests services based on user queries instantly",
@@ -112,6 +113,7 @@ export const projects = [
   },
   {
     name: "NextStep-AI",
+    slug: "nextstep-ai",
     description: "NextStep-AI is your smart career companion, designed to streamline job preparation with AI-powered tools",
     points: [
       "Get personalized industry insights",
@@ -130,6 +132,7 @@ export const projects = [
   },
   {
     name: "Axel-AI",
+    slug: "axel-ai",
     description: "Smart Mobility with AI & IoT — An autonomous car powered by deep learning and embedded systems.",
     points: [
       "Real-time traffic sign recognition and smart navigation.",
@@ -150,6 +153,7 @@ export const projects = [
   },
   {
     name: "LIMMY AI  v1.0",
+    slug: "limmy-ai-v1-0",
     description: "A smart virtual assistant built with Python that understands and responds to voice commands using intelligent automation.",
     points: [
       "Smart Query Handling",
@@ -167,6 +171,7 @@ export const projects = [
   },
   {
     name: "AI-Interview",
+    slug: "ai-interview",
     description: "A smart web app that simulates interviews based on user skills and experience for effective job prep.",
     points: [
       " Personalized Interview Simulation with AI",
@@ -186,6 +191,7 @@ export const projects = [
   },
   {
     name: "TeamSync - The project manager",
+    slug: "teamsync-project-manager",
     description: "A full-stack SaaS tool for managing teams, projects, and workflows with workspace creation, role assignments, and progress tracking.",
     points: [
       "Developed using MERN Stack with secure authentication and scalable APIs.",
@@ -208,6 +214,7 @@ export const projects = [
   },
   {
     name: "Coaching Website for my client",
+    slug: "coaching-website",
     description: "Created a responsive coaching website using Next.js and Firebase with real-time course listings, contact form, and client-managed content.",
     points: [
       "Built coaching website with Next.js, Firebase",
@@ -227,6 +234,7 @@ export const projects = [
   },
   {
     name: "Digital Attendance",
+    slug: "digital-attendance",
     description: "A Smart Facial Recognition for Seamless Attendance Tracking .",
     points: [
       "AI-Powered Face Recognition with High accuracy",
@@ -244,6 +252,7 @@ export const projects = [
   },
   {
     name: "Datapirates",
+    slug: "datapirates",
     description: "A modern learning platform that allows users to explore, enroll in, and track progress across a variety of interactive courses.",
     points: [
       "Easy signup for diverse courses across domains",
@@ -262,6 +271,7 @@ export const projects = [
   },
   {
     name: "AI-Pocket-Agent",
+    slug: "ai-pocket-agent",
     description: "AI Pocket Agent is a mobile AI chat application that allows users to create custom AI agents, chat with them in real time, send images, and save conversations to the cloud.",
     points: [
       "Real-time chat with AI models",
@@ -279,6 +289,7 @@ export const projects = [
   },
   {
     name: "Apex News : A news website using Django",
+    slug: "apex-news-django",
     description: "A responsive news website built with Django and Python, featuring a clean UI and dynamic content management.",
     points: [
       "Responsive design for all devices",
