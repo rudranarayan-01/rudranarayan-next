@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 "use client";
 
 import React, { useEffect, useState } from "react";
@@ -28,6 +29,7 @@ interface ProjectItem {
   longDescription?: string;
   status: string;
   thumbnailUrl: string;
+  galleryImages?: string[];
   clientInfo?: ClientInfo;
   links: ProjectLink[];
   techStack: string[];
@@ -47,11 +49,12 @@ export default function AdminProjectsPage() {
     longDescription: "",
     status: "Published",
     thumbnailUrl: "",
+    galleryImagesText: "", // New: One image URL per line or comma-separated
     clientName: "",
     clientCompany: "",
     linksText: "",
     techStackText: "",
-    architectureText: "", // Format: Title | Description | Tech1, Tech2 (one step per line)
+    architectureText: "",
   });
 
   useEffect(() => {
@@ -74,15 +77,14 @@ export default function AdminProjectsPage() {
   const handleOpenModal = (project?: ProjectItem) => {
     if (project) {
       setEditingSlug(project.slug || null);
-      
-      // Format existing architectureFlow into clean editable text lines
+
       const archFormatted = project.architectureFlow
         ? project.architectureFlow
             .map(
               (step) =>
                 `${step.title} | ${step.description} | ${
                   step.techUsed ? step.techUsed.join(", ") : ""
-                }`
+                }`,
             )
             .join("\n")
         : "";
@@ -94,6 +96,9 @@ export default function AdminProjectsPage() {
         longDescription: project.longDescription || "",
         status: project.status || "Published",
         thumbnailUrl: project.thumbnailUrl || "",
+        galleryImagesText: project.galleryImages
+          ? project.galleryImages.join("\n")
+          : "",
         clientName: project.clientInfo?.name || "",
         clientCompany: project.clientInfo?.company || "",
         linksText: project.links
@@ -111,6 +116,7 @@ export default function AdminProjectsPage() {
         longDescription: "",
         status: "Published",
         thumbnailUrl: "",
+        galleryImagesText: "",
         clientName: "",
         clientCompany: "",
         linksText: "",
@@ -141,6 +147,12 @@ export default function AdminProjectsPage() {
       .map((t) => t.trim())
       .filter(Boolean);
 
+    // Parse gallery images (split by newline or comma)
+    const parsedGalleryImages = form.galleryImagesText
+      .split(/[\n,]/)
+      .map((img) => img.trim())
+      .filter(Boolean);
+
     // Parse architecture pipeline text lines into structured objects
     const parsedArchitecture: ArchitectureStep[] = form.architectureText
       .split("\n")
@@ -150,7 +162,10 @@ export default function AdminProjectsPage() {
         const title = parts[0] || `Phase ${index + 1}`;
         const description = parts[1] || "";
         const techUsed = parts[2]
-          ? parts[2].split(",").map((t) => t.trim()).filter(Boolean)
+          ? parts[2]
+              .split(",")
+              .map((t) => t.trim())
+              .filter(Boolean)
           : [];
 
         return {
@@ -171,6 +186,7 @@ export default function AdminProjectsPage() {
       thumbnailUrl:
         form.thumbnailUrl ||
         "https://images.unsplash.com/photo-1581092335397-9583fe92d232?q=80&w=1200&auto=format&fit=crop",
+      galleryImages: parsedGalleryImages,
       clientInfo: {
         name: form.clientName,
         company: form.clientCompany,
@@ -189,7 +205,9 @@ export default function AdminProjectsPage() {
         });
         const json = await res.json();
         if (json.success) {
-          setProjects(projects.map((p) => (p.slug === editingSlug ? json.data : p)));
+          setProjects(
+            projects.map((p) => (p.slug === editingSlug ? json.data : p)),
+          );
           toast.success("Project updated successfully.");
         } else {
           toast.error(json.error || "Failed to update project.");
@@ -240,9 +258,12 @@ export default function AdminProjectsPage() {
     <div className="space-y-6 pb-12 max-w-6xl mx-auto">
       <div className="flex items-center justify-between border-b border-zinc-800 pb-5">
         <div>
-          <h1 className="text-xl font-bold text-white">Project Showcase Control</h1>
+          <h1 className="text-xl font-bold text-white">
+            Project Showcase Control
+          </h1>
           <p className="text-xs text-zinc-400 mt-1 font-mono">
-            Manage deployments, client info, architecture pipelines, and specs.
+            Manage deployments, client info, gallery images, architecture
+            pipelines, and specs.
           </p>
         </div>
         <button
@@ -254,7 +275,9 @@ export default function AdminProjectsPage() {
       </div>
 
       {loading ? (
-        <p className="text-xs font-mono text-zinc-500 animate-pulse">Synchronizing fleet...</p>
+        <p className="text-xs font-mono text-zinc-500 animate-pulse">
+          Synchronizing fleet...
+        </p>
       ) : projects.length === 0 ? (
         <div className="py-16 text-center border border-dashed border-zinc-800 rounded-2xl text-xs font-mono text-zinc-500">
           No records registered in database.
@@ -262,17 +285,30 @@ export default function AdminProjectsPage() {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {projects.map((item) => (
-            <div key={item.slug} className="p-5 bg-zinc-950 border border-zinc-800 rounded-2xl space-y-3 relative group">
+            <div
+              key={item.slug}
+              className="p-5 bg-zinc-950 border border-zinc-800 rounded-2xl space-y-3 relative group"
+            >
               <div className="flex justify-between items-start">
                 <div>
-                  <h3 className="text-base font-bold text-white">{item.name}</h3>
-                  <span className="text-[10px] font-mono text-emerald-400">slug: /{item.slug}</span>
+                  <h3 className="text-base font-bold text-white">
+                    {item.name}
+                  </h3>
+                  <span className="text-[10px] font-mono text-emerald-400">
+                    slug: /{item.slug}
+                  </span>
                 </div>
                 <div className="flex gap-3 text-xs font-mono">
-                  <button onClick={() => handleOpenModal(item)} className="text-zinc-400 hover:text-white transition-colors">
+                  <button
+                    onClick={() => handleOpenModal(item)}
+                    className="text-zinc-400 hover:text-white transition-colors"
+                  >
                     Edit
                   </button>
-                  <button onClick={() => handleDelete(item.slug)} className="text-zinc-500 hover:text-red-400 transition-colors">
+                  <button
+                    onClick={() => handleDelete(item.slug)}
+                    className="text-zinc-500 hover:text-red-400 transition-colors"
+                  >
                     Delete
                   </button>
                 </div>
@@ -280,28 +316,47 @@ export default function AdminProjectsPage() {
 
               {item.clientInfo?.company && (
                 <p className="text-[11px] font-mono text-zinc-400">
-                  Client: <span className="text-zinc-200">{item.clientInfo.name}</span> ({item.clientInfo.company})
+                  Client:{" "}
+                  <span className="text-zinc-200">{item.clientInfo.name}</span>{" "}
+                  ({item.clientInfo.company})
                 </p>
               )}
 
-              <p className="text-xs text-zinc-400 line-clamp-2">{item.description}</p>
-              
+              <p className="text-xs text-zinc-400 line-clamp-2">
+                {item.description}
+              </p>
+
               <div className="flex flex-wrap gap-1.5 pt-1">
                 {item.techStack?.map((t, i) => (
-                  <span key={i} className="text-[9px] font-mono px-2 py-0.5 rounded bg-zinc-900 border border-zinc-800 text-zinc-300">
+                  <span
+                    key={i}
+                    className="text-[9px] font-mono px-2 py-0.5 rounded bg-zinc-900 border border-zinc-800 text-zinc-300"
+                  >
                     {t}
                   </span>
                 ))}
               </div>
 
+              {item.galleryImages && item.galleryImages.length > 0 && (
+                <p className="text-[10px] font-mono text-blue-400">
+                  🖼️ Gallery Images: {item.galleryImages.length} attached
+                </p>
+              )}
+
               {item.architectureFlow && item.architectureFlow.length > 0 && (
                 <p className="text-[10px] font-mono text-amber-400">
-                  ⚙️ Architecture Pipeline: {item.architectureFlow.length} Phases configured
+                  ⚙️ Architecture Pipeline: {item.architectureFlow.length}{" "}
+                  Phases configured
                 </p>
               )}
 
               <div className="flex gap-4 text-[11px] font-mono text-emerald-400 pt-2 border-t border-zinc-900">
-                <a href={`/projects/${item.slug}`} target="_blank" rel="noreferrer" className="underline hover:text-emerald-300">
+                <a
+                  href={`/projects/${item.slug}`}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="underline hover:text-emerald-300"
+                >
                   View Specs Page ↗
                 </a>
               </div>
@@ -315,9 +370,14 @@ export default function AdminProjectsPage() {
         <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-zinc-950 border border-zinc-800 rounded-2xl w-full max-w-xl p-6 space-y-4 shadow-2xl max-h-[90vh] overflow-y-auto">
             <h3 className="text-xs font-mono font-bold text-white uppercase tracking-wider">
-              {editingSlug !== null ? "Edit Deployment Record" : "Add New Deployment Record"}
+              {editingSlug !== null
+                ? "Edit Deployment Record"
+                : "Add New Deployment Record"}
             </h3>
-            <form onSubmit={handleSubmit} className="space-y-3 text-xs font-mono">
+            <form
+              onSubmit={handleSubmit}
+              className="space-y-3 text-xs font-mono"
+            >
               <div className="grid grid-cols-2 gap-2">
                 <input
                   type="text"
@@ -341,14 +401,18 @@ export default function AdminProjectsPage() {
                   type="text"
                   placeholder="Client Name (e.g. Shiv Kukreja)"
                   value={form.clientName}
-                  onChange={(e) => setForm({ ...form, clientName: e.target.value })}
+                  onChange={(e) =>
+                    setForm({ ...form, clientName: e.target.value })
+                  }
                   className="w-full px-3 py-2 bg-zinc-900 border border-zinc-800 rounded-xl text-white focus:outline-none"
                 />
                 <input
                   type="text"
                   placeholder="Client Company (e.g. HouseXpertz Delhi)"
                   value={form.clientCompany}
-                  onChange={(e) => setForm({ ...form, clientCompany: e.target.value })}
+                  onChange={(e) =>
+                    setForm({ ...form, clientCompany: e.target.value })
+                  }
                   className="w-full px-3 py-2 bg-zinc-900 border border-zinc-800 rounded-xl text-white focus:outline-none"
                 />
               </div>
@@ -357,7 +421,9 @@ export default function AdminProjectsPage() {
                 rows={2}
                 placeholder="Short Description"
                 value={form.description}
-                onChange={(e) => setForm({ ...form, description: e.target.value })}
+                onChange={(e) =>
+                  setForm({ ...form, description: e.target.value })
+                }
                 className="w-full px-3 py-2 bg-zinc-900 border border-zinc-800 rounded-xl text-white focus:outline-none resize-none font-sans"
               />
 
@@ -365,7 +431,9 @@ export default function AdminProjectsPage() {
                 rows={3}
                 placeholder="Detailed Implementation Overview (long description)"
                 value={form.longDescription}
-                onChange={(e) => setForm({ ...form, longDescription: e.target.value })}
+                onChange={(e) =>
+                  setForm({ ...form, longDescription: e.target.value })
+                }
                 className="w-full px-3 py-2 bg-zinc-900 border border-zinc-800 rounded-xl text-white focus:outline-none resize-none font-sans"
               />
 
@@ -384,8 +452,26 @@ export default function AdminProjectsPage() {
                   type="text"
                   placeholder="Thumbnail Image URL"
                   value={form.thumbnailUrl}
-                  onChange={(e) => setForm({ ...form, thumbnailUrl: e.target.value })}
+                  onChange={(e) =>
+                    setForm({ ...form, thumbnailUrl: e.target.value })
+                  }
                   className="w-full px-3 py-2 bg-zinc-900 border border-zinc-800 rounded-xl text-white focus:outline-none"
+                />
+              </div>
+
+              {/* Gallery Images Field */}
+              <div className="space-y-1">
+                <label className="text-[10px] font-mono text-blue-400 uppercase tracking-widest block">
+                  Gallery Images (One URL per line or comma-separated)
+                </label>
+                <textarea
+                  rows={3}
+                  placeholder="https://images.unsplash.com/photo-...\nhttps://images.unsplash.com/photo-..."
+                  value={form.galleryImagesText}
+                  onChange={(e) =>
+                    setForm({ ...form, galleryImagesText: e.target.value })
+                  }
+                  className="w-full px-3 py-2 bg-zinc-900 border border-zinc-800 rounded-xl text-white focus:outline-none resize-none font-mono text-[11px]"
                 />
               </div>
 
@@ -393,7 +479,9 @@ export default function AdminProjectsPage() {
                 rows={2}
                 placeholder="Action Links (Format -> Label: https://url.com, one per line)"
                 value={form.linksText}
-                onChange={(e) => setForm({ ...form, linksText: e.target.value })}
+                onChange={(e) =>
+                  setForm({ ...form, linksText: e.target.value })
+                }
                 className="w-full px-3 py-2 bg-zinc-900 border border-zinc-800 rounded-xl text-white focus:outline-none resize-none font-mono text-[11px]"
               />
 
@@ -401,20 +489,25 @@ export default function AdminProjectsPage() {
                 type="text"
                 placeholder="Tech Stack (Comma-separated, e.g. React, Next.js, Node.js)"
                 value={form.techStackText}
-                onChange={(e) => setForm({ ...form, techStackText: e.target.value })}
+                onChange={(e) =>
+                  setForm({ ...form, techStackText: e.target.value })
+                }
                 className="w-full px-3 py-2 bg-zinc-900 border border-zinc-800 rounded-xl text-white focus:outline-none"
               />
 
               {/* Architecture Pipeline Field */}
               <div className="space-y-1">
                 <label className="text-[10px] font-mono text-amber-400 uppercase tracking-widest block">
-                  Architecture Pipeline (Format: Title | Description | Tech1, Tech2)
+                  Architecture Pipeline (Format: Title | Description | Tech1,
+                  Tech2)
                 </label>
                 <textarea
                   rows={4}
                   placeholder="Phase Title | Step breakdown description | Next.js, TypeScript"
                   value={form.architectureText}
-                  onChange={(e) => setForm({ ...form, architectureText: e.target.value })}
+                  onChange={(e) =>
+                    setForm({ ...form, architectureText: e.target.value })
+                  }
                   className="w-full px-3 py-2 bg-zinc-900 border border-zinc-800 rounded-xl text-white focus:outline-none resize-none font-mono text-[11px]"
                 />
               </div>
@@ -427,7 +520,10 @@ export default function AdminProjectsPage() {
                 >
                   Cancel
                 </button>
-                <button type="submit" className="px-4 py-2 bg-white text-black font-semibold rounded-xl hover:bg-zinc-200">
+                <button
+                  type="submit"
+                  className="px-4 py-2 bg-white text-black font-semibold rounded-xl hover:bg-zinc-200"
+                >
                   Save Deployment
                 </button>
               </div>
