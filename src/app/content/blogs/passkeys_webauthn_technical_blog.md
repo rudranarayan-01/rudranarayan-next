@@ -87,7 +87,6 @@ Unlike PEM/X.509 certificates commonly used in TLS, WebAuthn encodes public keys
 
 During authentication, the authenticator signs the concatenation of `authenticatorData || SHA256(clientDataJSON)` using the private key:
 
-$$\text{Signature} = \text{Sign}_{\text{privKey}}\Big(\text{authenticatorData} \;\|\; \text{SHA256}(\text{clientDataJSON})\Big)$$
 
 Suppose a user clicks a phishing link pointing to `https://app-example.com` (or a reverse proxy at `https://login.evil-proxy.com`).
 
