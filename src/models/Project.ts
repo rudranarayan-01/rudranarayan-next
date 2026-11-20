@@ -1,30 +1,41 @@
-import  { Schema, model, models } from "mongoose";
+import{ Schema, models, model } from "mongoose";
+
+// Sub-schema for external or deployment links
+const ProjectLinkSchema = new Schema({
+  label: { type: String, required: true }, // e.g. "Live Demo", "GitHub", "API Docs"
+  url: { type: String, required: true },
+  icon: { type: String, default: "external" }, 
+});
+
+// Sub-schema for architecture flow steps
+const ArchitectureFlowSchema = new Schema({
+  stepNumber: { type: Number, required: true },
+  title: { type: String, required: true },
+  description: { type: String, required: true },
+  techUsed: [{ type: String }],
+});
 
 const ProjectSchema = new Schema(
   {
     name: { type: String, required: true },
-    type: { 
-      type: String, 
-      enum: ["freelance", "office", "personal"], 
-      required: true 
-    },
-    status: { 
-      type: String, 
-      enum: ["active", "completed", "on-hold"], 
-      default: "active" 
-    },
+    slug: { type: String, required: true, unique: true, index: true },
     description: { type: String, required: true },
-    techStack: [{ type: String }],
+    longDescription: { type: String },
+    status: { type: String, enum: ["Published", "In Development", "Archived"], default: "Published" },
     
-    // Freelance specific details (Null for office projects)
+    // Core Media & Assets
+    thumbnailUrl: { type: String }, 
+    galleryImages: [{ type: String }],
+    
+    links: [ProjectLinkSchema],
+    
+    architectureFlow: [ArchitectureFlowSchema],
+    
+    techStack: [{ type: String }],
     clientInfo: {
-      name: { type: String, default: null },
-      email: { type: String, default: null },
-      company: { type: String, default: null },
+      name: { type: String },
+      company: { type: String },
     },
-
-    startDate: { type: Date, required: true },
-    endDate: { type: Date, default: null },
   },
   { timestamps: true }
 );
