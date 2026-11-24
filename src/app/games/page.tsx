@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
+import { motion } from "motion/react";
 import { FiArrowLeft, FiLock, FiPlay, FiX } from "react-icons/fi";
 import { PORTFOLIO_GAMES, PortfolioGame } from "@/data/games";
 import PacketRecoveryGame from "../components/games/PacketRecoveryGame";
@@ -10,6 +11,9 @@ import LatencyDodgeGame from "../components/games/LatencyDodgeGame";
 import IndexSprintGame from "../components/games/IndexSprintGame";
 import SequenceMemoryGame from "../components/games/SequenceMemoryGame";
 import GridSweepGame from "../components/games/GridSweepGame";
+import ArcadeCharacters from "../components/games/ArcadeCharacters";
+import FlagCipherGame from "../components/games/FlagCipherGame";
+import StackGuesserGame from "../components/games/StackGuesserGame";
 
 export default function GamesDashboardPage() {
   const [selectedBoardGameId, setSelectedBoardGameId] = useState<string>(
@@ -32,15 +36,57 @@ export default function GamesDashboardPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#09090b] text-zinc-100 px-4 py-8 sm:px-6 lg:px-10 font-sans">
-      <div className="max-w-6xl mx-auto space-y-6">
-        {/* Top Bar */}
-        <header className="flex items-center justify-between gap-4 pb-4 border-b border-zinc-800">
-          <div>
-            <p className="text-xs font-mono text-emerald-400">Games</p>
-            <h1 className="text-2xl font-semibold tracking-tight text-white mt-0.5">
-              {activePlayingGame ? activePlayingGame.title : "Mini-Games"}
-            </h1>
+    <div className="relative min-h-screen bg-[#09090b] text-zinc-100 px-4 py-8 sm:px-6 lg:px-10 font-sans overflow-x-clip">
+      {/* Subtle game-zone ambient grid & top scanline */}
+      <ArcadeCharacters isPlaying={Boolean(activePlayingGame)} />
+      <div
+        aria-hidden="true"
+        className="pointer-events-none fixed inset-0 opacity-[0.08]"
+        style={{
+          backgroundImage:
+            "radial-gradient(circle, #52525b 1px, transparent 1px)",
+          backgroundSize: "24px 24px",
+        }}
+      />
+
+      <div className="relative max-w-6xl mx-auto space-y-6">
+        {/* Top Bar with Animated HUD Accent */}
+        <header className="relative overflow-hidden rounded-xl border border-zinc-800 bg-[#111114] px-5 py-4 flex items-center justify-between gap-4">
+          <motion.div
+            aria-hidden="true"
+            initial={{ x: "-100%" }}
+            animate={{ x: "220%" }}
+            transition={{
+              repeat: Infinity,
+              repeatDelay: 4,
+              duration: 1.8,
+              ease: "easeInOut",
+            }}
+            className="pointer-events-none absolute top-0 left-0 h-[1.5px] w-1/3 bg-gradient-to-r from-transparent via-emerald-400/80 to-transparent"
+          />
+
+          <div className="flex items-center gap-3">
+            <span className="relative flex h-2.5 w-2.5 shrink-0">
+              <motion.span
+                animate={{ scale: [1, 1.7, 1], opacity: [0.75, 0.1, 0.75] }}
+                transition={{
+                  duration: 2,
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                }}
+                className="absolute inline-flex h-full w-full rounded-full bg-emerald-400"
+              />
+              <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-emerald-400" />
+            </span>
+
+            <div>
+              <p className="text-[11px] font-mono uppercase tracking-wider text-emerald-400">
+                Arcade Zone
+              </p>
+              <h1 className="text-xl sm:text-2xl font-semibold tracking-tight text-white">
+                {activePlayingGame ? activePlayingGame.title : "Mini-Games"}
+              </h1>
+            </div>
           </div>
 
           <div className="flex items-center gap-2.5">
@@ -76,23 +122,34 @@ export default function GamesDashboardPage() {
             }
           >
             {activePlayingGame ? (
-              activePlayingGame.id === "packet-recovery" ? (
-                <PacketRecoveryGame gameId="packet-recovery" compact />
-              ) : activePlayingGame.id === "latency-dodge" ? (
-                <LatencyDodgeGame gameId="latency-dodge" compact />
-              ) : activePlayingGame.id === "index-sprint" ? (
-                <IndexSprintGame gameId="index-sprint" compact />
-              ) : activePlayingGame.id === "sequence-memory" ? (
-                <SequenceMemoryGame gameId="sequence-memory" compact />
-              ) : activePlayingGame.id === "grid-sweep" ? (
-                <GridSweepGame gameId="grid-sweep" />
-              ) : (
-                <div className="border border-zinc-800 rounded-md bg-[#111114] h-80 flex items-center justify-center text-xs font-mono text-zinc-400">
-                  {activePlayingGame.title} — not available yet.
-                </div>
-              )
+              <motion.div
+                key={activePlayingGame.id}
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.2 }}
+              >
+                {activePlayingGame.id === "packet-recovery" ? (
+                  <PacketRecoveryGame gameId="packet-recovery" compact />
+                ) : activePlayingGame.id === "latency-dodge" ? (
+                  <LatencyDodgeGame gameId="latency-dodge" compact />
+                ) : activePlayingGame.id === "index-sprint" ? (
+                  <IndexSprintGame gameId="index-sprint" compact />
+                ) : activePlayingGame.id === "sequence-memory" ? (
+                  <SequenceMemoryGame gameId="sequence-memory" compact />
+                ) : activePlayingGame.id === "grid-sweep" ? (
+                  <GridSweepGame gameId="grid-sweep" />
+                ) : activePlayingGame.id === "flag-cipher" ? (
+                  <FlagCipherGame gameId="flag-cipher" compact />
+                ) : activePlayingGame.id === "stack-guesser" ? (
+                  <StackGuesserGame gameId="stack-guesser" compact />
+                ) : (
+                  <div className="border border-zinc-800 rounded-md bg-[#111114] h-80 flex items-center justify-center text-xs font-mono text-zinc-400">
+                    {activePlayingGame.title} — not available yet.
+                  </div>
+                )}
+              </motion.div>
             ) : (
-              <div className="border border-zinc-800 rounded-md bg-[#111114] divide-y divide-zinc-800">
+              <div className="border border-zinc-800 rounded-xl bg-[#111114] divide-y divide-zinc-800 overflow-hidden">
                 {PORTFOLIO_GAMES.map((game) => {
                   const isPlayable = game.status === "playable";
                   const isBoardSelected = game.id === boardGame.id;
@@ -105,15 +162,28 @@ export default function GamesDashboardPage() {
                         setSelectedBoardGameId(game.id);
                         if (isPlayable) handlePlayGame(game);
                       }}
-                      className={`group px-4 py-3.5 flex items-center justify-between gap-4 transition-colors ${
+                      className={`group relative px-5 py-4 flex items-center justify-between gap-4 transition-colors ${
                         isPlayable
-                          ? "cursor-pointer hover:bg-zinc-900/70"
+                          ? "cursor-pointer hover:bg-zinc-900/75"
                           : "opacity-60"
-                      } ${isBoardSelected ? "bg-zinc-900/40" : ""}`}
+                      } ${isBoardSelected ? "bg-zinc-900/45" : ""}`}
                     >
-                      <div className="min-w-0 space-y-0.5">
+                      {/* Animated active selection bar */}
+                      {isBoardSelected && (
+                        <motion.span
+                          layoutId="activeGameIndicator"
+                          transition={{
+                            type: "spring",
+                            stiffness: 380,
+                            damping: 30,
+                          }}
+                          className="absolute left-0 top-2.5 bottom-2.5 w-[3px] rounded-r bg-emerald-400"
+                        />
+                      )}
+
+                      <div className="min-w-0 space-y-0.5 pl-1">
                         <div className="flex items-center gap-2.5">
-                          <h2 className="text-sm font-medium text-zinc-100 truncate">
+                          <h2 className="text-sm font-medium text-zinc-100 group-hover:text-white transition-colors truncate">
                             {game.title}
                           </h2>
                           <span className="text-[11px] font-mono text-zinc-500">
@@ -142,9 +212,9 @@ export default function GamesDashboardPage() {
                               e.stopPropagation();
                               handlePlayGame(game);
                             }}
-                            className="opacity-0 group-hover:opacity-100 focus:opacity-100 px-3 py-1 rounded border border-zinc-700 bg-zinc-950 hover:bg-zinc-800 text-xs font-mono text-zinc-100 inline-flex items-center gap-1.5 transition-opacity cursor-pointer"
+                            className="opacity-0 translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 focus:opacity-100 focus:translate-x-0 px-3 py-1 rounded-md border border-emerald-500/40 bg-emerald-500/15 hover:bg-emerald-500 text-emerald-300 hover:text-zinc-950 font-semibold text-xs font-mono inline-flex items-center gap-1.5 transition-all duration-150 cursor-pointer"
                           >
-                            <FiPlay className="w-3 h-3" />
+                            <FiPlay className="w-3 h-3 fill-current" />
                             <span>Play</span>
                           </button>
                         ) : (

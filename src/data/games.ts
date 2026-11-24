@@ -58,4 +58,24 @@ export const PORTFOLIO_GAMES: PortfolioGame[] = [
     status: "playable",
     tag: "Logic · Speed",
   },
+  {
+    id: "flag-cipher",
+    title: "Flag Cipher",
+    tagline: "Identify world flags against a 45-second clock.",
+    description:
+      "Fast-paced vexillology sprint with streak multipliers and keyboard shortcuts.",
+    controls: "Keys 1–4 or Click",
+    status: "playable",
+    tag: "Trivia · Speed",
+  },
+  {
+    id: "stack-guesser",
+    title: "Stack Guesser",
+    tagline: "Recognize developer tools, languages, and frameworks by logo.",
+    description:
+      "Tech brand and stack mark recognition sprint across modern web, cloud, and database tools.",
+    controls: "Keys 1–4 or Click",
+    status: "playable",
+    tag: "Dev · Visual",
+  },
 ];

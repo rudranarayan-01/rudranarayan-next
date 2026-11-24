@@ -29,7 +29,7 @@ import {
   SiFramer,
   SiVercel,
 } from "react-icons/si";
-import { LuSquareCode } from "react-icons/lu";
+import { LuGamepad2, LuSquareCode } from "react-icons/lu";
 import { SiScikitlearn, SiPytorch, SiOpencv, SiTensorflow, SiPandas, SiFlask, SiDjango, SiExpo } from "react-icons/si";
 
 import React from 'react';
@@ -77,6 +77,7 @@ export const navbarData: NavbarItem[] = [
   { name: "Projects", type: "link", icon: LuSquareCode, url: "/projects", size: "18px" },
   { name: "Contact", type: "scroll", icon: FiMail, size: "18px" },
   { name: "Blog", type: "link", icon: FaBlog, size: "18px", url: "/blog" },
+  { name: "Games", type: "link", icon: LuGamepad2, size: "20px", url: "/games" },
   {
     name: "Github",
     type: "link",
