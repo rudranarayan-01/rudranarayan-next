@@ -1,13 +1,12 @@
 import type { Metadata } from "next";
 import { Outfit, Geist } from "next/font/google";
 import "./globals.css";
-import React from 'react';
+import React from "react";
 import PublicDecorators from "./components/PublicDecorators";
 import { cn } from "@/lib/utils";
-import { Toaster } from "@/components/ui/sonner"
+import { Toaster } from "@/components/ui/sonner";
 
-const geist = Geist({subsets:['latin'],variable:'--font-sans'});
-
+const geist = Geist({ subsets: ["latin"], variable: "--font-sans" });
 
 // import {Toaster} from "sonner"
 

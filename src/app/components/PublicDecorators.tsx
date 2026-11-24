@@ -4,6 +4,7 @@ import { usePathname } from "next/navigation";
 import RippleCursor from "./RippleCursor";
 import { CommandPalette } from "./CommandPalette";
 import { BlogToast } from "./BlogToast";
+import { NewGameToast } from "./games/NewGamePopup";
 
 export default function PublicDecorators() {
   const pathname = usePathname();
@@ -17,6 +18,7 @@ export default function PublicDecorators() {
     <>
       <RippleCursor />
       <CommandPalette />
+      <NewGameToast />
       <BlogToast />
     </>
   );

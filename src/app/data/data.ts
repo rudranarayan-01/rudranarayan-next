@@ -337,8 +337,15 @@ export const education2 = {
 export const experiences = [
   {
     role: "Full Stack Developer",
+    company:"IVTEX Corporate Solutions Pvt. Ltd.",
+    duration: "Oct 2026 – Present",
+    description:
+      "I work as a Full Stack Developer building AI-powered platforms and complex systems using Node.js and Python backends, data pipelines, and workflow automation for global clients. Alongside full-stack web and mobile applications built with Next.js, React Native, PostgreSQL, MongoDB, Supabase, Firebase, Supabase and Redis, I design scalable backend architectures with secure authentication, REST APIs, real-time features, AI integrations, and reliable deployments.",
+  },
+  {
+    role: "Full Stack Developer",
     company:"Maastrix Solutions",
-    duration: "Mar 2026 – Present",
+    duration: "Mar 2026 – Sept 2026",
     description:
       "Primarily focused on building scalable and efficient server-side systems using modern technologies, along with developing cross-platform mobile applications using React Native. Experienced in designing RESTful APIs, handling database operations, and ensuring seamless integration between frontend and backend systems. Adept at optimizing performance, debugging complex issues, and delivering robust, user-centric solutions in fast-paced development environments.",
   },
