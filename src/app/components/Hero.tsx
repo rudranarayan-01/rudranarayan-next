@@ -93,7 +93,7 @@ const Hero = React.forwardRef<HTMLElement, unknown>((_, ref) => {
           variants={{
             hover: { scale: 1.05 },
           }}
-          href="https://drive.google.com/file/d/1PF3EVkvZ9HJ0P601C0Vh1kc9bMMhGs4w/view?usp=sharing"
+          href="https://drive.google.com/file/d/1OZxU3-AGK2aE7AbtakCsyLfnIvDUV053/view?usp=sharing"
           target="_blank"
           rel="noopener noreferrer"
           className="px-8 flex justify-center items-center gap-2 py-2 rounded-full border border-neutral-600 text-sm md:text-lg cursor-pointer bg-neutral-900/50 backdrop-blur-sm"
