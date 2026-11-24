@@ -74,14 +74,14 @@ type NavbarItem = {
 export const navbarData: NavbarItem[] = [
   { name: "Home", type: "scroll", icon: FiHome, size: "18px" },
   { name: "About", type: "scroll", icon: TbUserSquare, size: "18px" },
-  { name: "Projects", type: "scroll", icon: LuSquareCode, size: "18px" },
+  { name: "Projects", type: "link", icon: LuSquareCode, url: "/projects", size: "18px" },
   { name: "Contact", type: "scroll", icon: FiMail, size: "18px" },
   { name: "Blog", type: "link", icon: FaBlog, size: "18px", url: "/blog" },
   {
     name: "Github",
     type: "link",
     icon: FaGithub,
-    url: "https://github.com/rudranarayan-01", // Replace "#" with your LinkedIn profile URL.
+    url: "https://github.com/rudranarayan-01",
     size: "18px",
   },
 ];

@@ -1,24 +1,38 @@
 "use client";
 
 import React, { RefObject } from "react";
+import { usePathname, useRouter } from "next/navigation";
 import { navbarData } from "../data/data";
 import { motion } from "motion/react";
 import { liVariants, tooltipVariants } from "../data/variants";
+
 interface HeaderProps {
-  sectionRefs: Record<string, RefObject<HTMLElement | null>>;
+  sectionRefs?: Record<string, RefObject<HTMLElement | null>>;
 }
+
 const Header: React.FC<HeaderProps> = ({ sectionRefs }) => {
-  const handleScroll = (
+  const pathname = usePathname();
+  const router = useRouter();
+
+  const handleNavClick = (
     section: string,
     type: "scroll" | "link",
     url?: string
   ) => {
-    if (type === "scroll") {
-      sectionRefs[section]?.current?.scrollIntoView({
-        behavior: "smooth",
-      });
-    } else if (type === "link" && url) {
-      window.open(url, "_blank");
+    if (type === "link" && url) {
+      window.open(url, "_blank", "noopener,noreferrer");
+      return;
+    }
+
+    const key = section.toLowerCase();
+    const targetRef = sectionRefs?.[key];
+
+    if (pathname === "/" && targetRef?.current) {
+      targetRef.current.scrollIntoView({ behavior: "smooth" });
+    } else if (key === "home") {
+      router.push("/");
+    } else {
+      router.push(`/#${key}`);
     }
   };
 
@@ -27,6 +41,7 @@ const Header: React.FC<HeaderProps> = ({ sectionRefs }) => {
       <motion.ul
         initial={{ y: -5, opacity: 0, rotateY: 45 }}
         whileInView={{ y: 0, opacity: 1, rotateY: 0 }}
+        viewport={{ once: true }}
         className="flex gap-2 md:gap-3 w-fit bg-neutral-950 border border-neutral-600 rounded-full px-3 py-1 mx-auto navbar"
         whileHover={{
           scaleX: 1.01,
@@ -53,13 +68,13 @@ const Header: React.FC<HeaderProps> = ({ sectionRefs }) => {
                   damping: 10,
                 }}
                 onClick={() =>
-                  handleScroll(item.name.toLowerCase(), item.type, item.url)
+                  handleNavClick(item.name, item.type, item.url)
                 }
               >
                 <motion.span>
                   <Icon style={{ fontSize: size }} />
                   <motion.span
-                    className="absolute  top-full left-1/2 -translate-x-1/2 mt-1.5 px-2 py-1 bg-white text-neutral-900 text-xs rounded-md whitespace-nowrap"
+                    className="absolute top-full left-1/2 -translate-x-1/2 mt-1.5 px-2 py-1 bg-white text-neutral-900 text-xs rounded-md whitespace-nowrap"
                     variants={tooltipVariants}
                     transition={{ duration: 0.2 }}
                   >
