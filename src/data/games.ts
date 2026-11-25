@@ -68,14 +68,14 @@ export const PORTFOLIO_GAMES: PortfolioGame[] = [
     status: "playable",
     tag: "Trivia · Speed",
   },
-  {
-    id: "stack-guesser",
-    title: "Stack Guesser",
-    tagline: "Recognize developer tools, languages, and frameworks by logo.",
+ {
+    id: "chess-tactics",
+    title: "Chess Tactics",
+    tagline: "Outmaneuver the bot, capture pieces, and deliver checkmate.",
     description:
-      "Tech brand and stack mark recognition sprint across modern web, cloud, and database tools.",
-    controls: "Keys 1–4 or Click",
+      "Turn-based 8x8 chess match against a tactical bot with piece-capture points and a checkmate bonus.",
+    controls: "Click Square",
     status: "playable",
-    tag: "Dev · Visual",
+    tag: "Strategy · Board",
   },
 ];

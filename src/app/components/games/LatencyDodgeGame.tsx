@@ -4,10 +4,10 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 import { FiCheck, FiPlay, FiRotateCcw } from "react-icons/fi";
 import Leaderboard from "./Leaderboard";
 
-interface SpikeObstacle {
+interface TrafficCarObstacle {
   id: number;
-  x: number; // 10..90%
-  y: number; // -6..105%
+  x: number; // 14..86%
+  y: number; // -8..106%
   speed: number;
   label: string;
 }
@@ -17,8 +17,113 @@ interface LatencyDodgeGameProps {
   compact?: boolean;
 }
 
-const SPIKE_LABELS = ["502", "504", "TIMEOUT", "JITTER", "DEADLOCK"];
+const TRAFFIC_LABELS = ["502", "504", "TIMEOUT", "JITTER", "DEADLOCK"];
 const NAME_STORAGE_KEY = "portfolio_game_player_name";
+
+// Player car positioned near bottom of road (% from top)
+const PLAYER_Y_PERCENT = 85;
+
+function PlayerCarIcon({ hitFlash }: { hitFlash: boolean }) {
+  return (
+    <svg
+      viewBox="0 0 48 76"
+      className="w-10 h-16 sm:w-11 sm:h-[68px] drop-shadow-[0_8px_14px_rgba(0,0,0,0.75)]"
+      aria-hidden="true"
+    >
+      {/* Wheels */}
+      <rect x="3" y="13" width="6" height="15" rx="2.5" fill="#18181b" stroke="#3f3f46" strokeWidth="1.2" />
+      <rect x="39" y="13" width="6" height="15" rx="2.5" fill="#18181b" stroke="#3f3f46" strokeWidth="1.2" />
+      <rect x="3" y="47" width="6" height="15" rx="2.5" fill="#18181b" stroke="#3f3f46" strokeWidth="1.2" />
+      <rect x="39" y="47" width="6" height="15" rx="2.5" fill="#18181b" stroke="#3f3f46" strokeWidth="1.2" />
+
+      {/* Car Body */}
+      <rect
+        x="9"
+        y="4"
+        width="30"
+        height="68"
+        rx="10"
+        fill={hitFlash ? "#ef4444" : "#10b981"}
+        stroke={hitFlash ? "#fca5a5" : "#6ee7b7"}
+        strokeWidth="1.8"
+      />
+
+      {/* Windshield & Rear Glass */}
+      <path
+        d="M13 21 Q24 17 35 21 L33 33 Q24 31 15 33 Z"
+        fill="#09090b"
+        opacity="0.85"
+      />
+      <path
+        d="M15 49 Q24 51 33 49 L35 60 Q24 63 13 60 Z"
+        fill="#09090b"
+        opacity="0.8"
+      />
+
+      {/* Roof */}
+      <rect x="15" y="34" width="18" height="14" rx="4" fill="#059669" />
+
+      {/* Headlights */}
+      <rect x="12" y="5" width="6" height="3" rx="1.5" fill="#fef08a" />
+      <rect x="30" y="5" width="6" height="3" rx="1.5" fill="#fef08a" />
+
+      {/* Taillights */}
+      <rect x="12" y="68" width="6" height="2.5" rx="1" fill="#fda4af" />
+      <rect x="30" y="68" width="6" height="2.5" rx="1" fill="#fda4af" />
+    </svg>
+  );
+}
+
+function RedObstacleCarIcon({ label }: { label: string }) {
+  return (
+    <div className="relative flex flex-col items-center">
+      <svg
+        viewBox="0 0 48 76"
+        className="w-10 h-16 sm:w-11 sm:h-[68px] drop-shadow-[0_6px_12px_rgba(0,0,0,0.7)]"
+        aria-hidden="true"
+      >
+        {/* Wheels */}
+        <rect x="3" y="13" width="6" height="15" rx="2.5" fill="#09090b" stroke="#52525b" strokeWidth="1.2" />
+        <rect x="39" y="13" width="6" height="15" rx="2.5" fill="#09090b" stroke="#52525b" strokeWidth="1.2" />
+        <rect x="3" y="47" width="6" height="15" rx="2.5" fill="#09090b" stroke="#52525b" strokeWidth="1.2" />
+        <rect x="39" y="47" width="6" height="15" rx="2.5" fill="#09090b" stroke="#52525b" strokeWidth="1.2" />
+
+        {/* Red Car Body */}
+        <rect
+          x="9"
+          y="4"
+          width="30"
+          height="68"
+          rx="10"
+          fill="#dc2626"
+          stroke="#fca5a5"
+          strokeWidth="1.6"
+        />
+
+        {/* Cabin Windows */}
+        <path
+          d="M14 20 Q24 17 34 20 L32 32 Q24 30 16 32 Z"
+          fill="#18181b"
+          opacity="0.85"
+        />
+        <rect x="15" y="34" width="18" height="14" rx="4" fill="#991b1b" />
+        <path
+          d="M16 49 Q24 51 32 49 L34 60 Q24 63 14 60 Z"
+          fill="#18181b"
+          opacity="0.8"
+        />
+
+        {/* Brake Lights (facing toward player) */}
+        <rect x="12" y="67.5" width="6" height="3" rx="1" fill="#fecdd3" />
+        <rect x="30" y="67.5" width="6" height="3" rx="1" fill="#fecdd3" />
+      </svg>
+
+      <span className="-mt-1 px-1.5 py-0.5 rounded bg-zinc-950/90 border border-rose-500/40 text-rose-300 text-[9px] font-mono leading-none tracking-tight">
+        {label}
+      </span>
+    </div>
+  );
+}
 
 export default function LatencyDodgeGame({
   gameId = "latency-dodge",
@@ -31,7 +136,8 @@ export default function LatencyDodgeGame({
   const [bestScore, setBestScore] = useState(0);
   const [lives, setLives] = useState(3);
   const [playerX, setPlayerX] = useState(50);
-  const [spikes, setSpikes] = useState<SpikeObstacle[]>([]);
+  const [cars, setCars] = useState<TrafficCarObstacle[]>([]);
+  const [roadOffset, setRoadOffset] = useState(0);
   const [hitFlash, setHitFlash] = useState(false);
 
   const [playerName, setPlayerName] = useState("");
@@ -49,6 +155,7 @@ export default function LatencyDodgeGame({
   });
   const nextIdRef = useRef(1);
   const lastSpawnRef = useRef(0);
+  const roadOffsetRef = useRef(0);
   const scoreAccumulatorRef = useRef(0);
   const scoreRef = useRef(0);
   const flashTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -77,7 +184,7 @@ export default function LatencyDodgeGame({
   }, [gameId]);
 
   const updatePlayerX = useCallback((next: number) => {
-    const clamped = Math.max(10, Math.min(90, next));
+    const clamped = Math.max(15, Math.min(85, next));
     playerXRef.current = clamped;
     setPlayerX(clamped);
   }, []);
@@ -85,9 +192,11 @@ export default function LatencyDodgeGame({
   const startGame = () => {
     scoreRef.current = 0;
     scoreAccumulatorRef.current = 0;
+    roadOffsetRef.current = 0;
     setScore(0);
     setLives(3);
-    setSpikes([]);
+    setCars([]);
+    setRoadOffset(0);
     setHitFlash(false);
     setSubmittedScore(null);
     setSubmitError(null);
@@ -139,6 +248,11 @@ export default function LatencyDodgeGame({
       const dt = Math.min(0.05, (now - lastTime) / 1000);
       lastTime = now;
 
+      // Scroll road markings smoothly
+      const roadSpeedPx = 240 + Math.min(220, scoreRef.current * 0.8);
+      roadOffsetRef.current = (roadOffsetRef.current + roadSpeedPx * dt) % 48;
+      setRoadOffset(roadOffsetRef.current);
+
       // Survival points (10 pts per second)
       scoreAccumulatorRef.current += dt * 10;
       const nextPoints = Math.floor(scoreAccumulatorRef.current);
@@ -156,51 +270,69 @@ export default function LatencyDodgeGame({
         });
       }
 
-      const moveSpeed = 76;
+      const moveSpeed = 78;
       if (keysRef.current.left && !keysRef.current.right) {
         updatePlayerX(playerXRef.current - moveSpeed * dt);
       } else if (keysRef.current.right && !keysRef.current.left) {
         updatePlayerX(playerXRef.current + moveSpeed * dt);
       }
 
-      const spawnInterval = Math.max(290, 760 - scoreRef.current * 2.2);
+      const spawnInterval = Math.max(360, 820 - scoreRef.current * 2.0);
       if (now - lastSpawnRef.current >= spawnInterval) {
         lastSpawnRef.current = now;
         const label =
-          SPIKE_LABELS[Math.floor(Math.random() * SPIKE_LABELS.length)];
-        setSpikes((prev) => [
-          ...prev,
-          {
-            id: nextIdRef.current++,
-            x: 10 + Math.random() * 80,
-            y: -5,
-            speed:
-              38 +
-              Math.random() * 18 +
-              Math.min(34, scoreRef.current * 0.14),
-            label,
-          },
-        ]);
+          TRAFFIC_LABELS[Math.floor(Math.random() * TRAFFIC_LABELS.length)];
+
+        // Pick a lane position with clear horizontal separation from recently spawned top cars
+        const lanes = [20, 38, 50, 62, 80];
+        let candidateX = lanes[Math.floor(Math.random() * lanes.length)];
+        setCars((prev) => {
+          const nearTop = prev.filter((c) => c.y < 18);
+          if (nearTop.length > 0) {
+            const safeLanes = lanes.filter((lx) =>
+              nearTop.every((other) => Math.abs(other.x - lx) >= 14)
+            );
+            if (safeLanes.length > 0) {
+              candidateX =
+                safeLanes[Math.floor(Math.random() * safeLanes.length)];
+            }
+          }
+
+          return [
+            ...prev,
+            {
+              id: nextIdRef.current++,
+              x: candidateX,
+              y: -8,
+              speed:
+                36 +
+                Math.random() * 14 +
+                Math.min(30, scoreRef.current * 0.12),
+              label,
+            },
+          ];
+        });
       }
 
-      setSpikes((prev) => {
-        const remaining: SpikeObstacle[] = [];
+      setCars((prev) => {
+        const remaining: TrafficCarObstacle[] = [];
         let collisions = 0;
 
-        for (const spike of prev) {
-          const nextY = spike.y + spike.speed * dt;
-          const hitPlayer =
-            nextY >= 81 &&
-            nextY <= 91 &&
-            Math.abs(spike.x - playerXRef.current) <= 10.5;
+        for (const car of prev) {
+          const nextY = car.y + car.speed * dt;
+          const dx = Math.abs(car.x - playerXRef.current);
+          const dy = Math.abs(nextY - PLAYER_Y_PERCENT);
+
+          // Tight hitbox matching actual car dimensions so nearby lanes do not false-crash
+          const hitPlayer = dx <= 5.8 && dy <= 7.5;
 
           if (hitPlayer) {
             collisions += 1;
             continue;
           }
 
-          if (nextY > 104) continue;
-          remaining.push({ ...spike, y: nextY });
+          if (nextY > 106) continue;
+          remaining.push({ ...car, y: nextY });
         }
 
         if (collisions > 0) {
@@ -304,42 +436,57 @@ export default function LatencyDodgeGame({
           </div>
         </div>
 
+        {/* Highway Road Arena */}
         <div
           ref={arenaRef}
           onPointerMove={handlePointerMove}
           onPointerDown={handlePointerMove}
-          className={`relative w-full rounded-xl border ${
-            hitFlash ? "border-rose-500/70" : "border-zinc-800"
-          } bg-[#111114] overflow-hidden touch-none transition-colors duration-150 ${arenaHeightClass}`}
+          style={gameState === "playing" ? { cursor: "none" } : undefined}
+          className={`relative z-10 w-full rounded-xl border ${
+            hitFlash ? "border-rose-500/80" : "border-zinc-800"
+          } bg-zinc-950 overflow-hidden touch-none transition-colors duration-150 ${
+            gameState === "playing" ? "cursor-none" : ""
+          } ${arenaHeightClass}`}
         >
+          {/* Road shoulders & asphalt surface */}
+          <div className="absolute inset-x-6 sm:inset-x-10 inset-y-0 bg-[#141418] border-x-2 border-zinc-700/80 pointer-events-none" />
+
+          {/* Animated dashed lane dividers */}
           <div
-            className="absolute inset-0 opacity-20 pointer-events-none"
+            className="absolute inset-y-0 left-1/3 -translate-x-1/2 w-[2px] pointer-events-none opacity-45"
             style={{
               backgroundImage:
-                "linear-gradient(to right, #27272a 1px, transparent 1px), linear-gradient(to bottom, #27272a 1px, transparent 1px)",
-              backgroundSize: "28px 28px",
+                "repeating-linear-gradient(to bottom, #a1a1aa 0px, #a1a1aa 20px, transparent 20px, transparent 48px)",
+              backgroundPositionY: `${roadOffset}px`,
+            }}
+          />
+          <div
+            className="absolute inset-y-0 left-2/3 -translate-x-1/2 w-[2px] pointer-events-none opacity-45"
+            style={{
+              backgroundImage:
+                "repeating-linear-gradient(to bottom, #a1a1aa 0px, #a1a1aa 20px, transparent 20px, transparent 48px)",
+              backgroundPositionY: `${roadOffset}px`,
             }}
           />
 
-          {spikes.map((spike) => (
+          {/* Red Obstacle Cars */}
+          {cars.map((car) => (
             <div
-              key={spike.id}
-              style={{ left: `${spike.x}%`, top: `${spike.y}%` }}
-              className="-translate-x-1/2 -translate-y-1/2 absolute px-2 py-0.5 rounded bg-rose-950/90 border border-rose-500/40 text-rose-300 text-[11px] font-mono pointer-events-none"
+              key={car.id}
+              style={{ left: `${car.x}%`, top: `${car.y}%` }}
+              className="-translate-x-1/2 -translate-y-1/2 absolute pointer-events-none"
             >
-              {spike.label}
+              <RedObstacleCarIcon label={car.label} />
             </div>
           ))}
 
-          {/* Player Node */}
+          {/* Player Car */}
           <div
-            style={{ left: `${playerX}%` }}
-            className={`-translate-x-1/2 absolute bottom-6 w-6 h-6 rounded-lg border transition-colors pointer-events-none ${
-              hitFlash
-                ? "bg-rose-500/30 border-rose-400"
-                : "bg-emerald-500/20 border-emerald-400 shadow-[0_0_16px_rgba(52,211,153,0.4)]"
-            }`}
-          />
+            style={{ left: `${playerX}%`, top: `${PLAYER_Y_PERCENT}%` }}
+            className="-translate-x-1/2 -translate-y-1/2 absolute pointer-events-none"
+          >
+            <PlayerCarIcon hitFlash={hitFlash} />
+          </div>
 
           {gameState !== "playing" && (
             <div className="absolute inset-0 bg-zinc-950/80 backdrop-blur-[2px] flex items-center justify-center p-5">
@@ -347,7 +494,7 @@ export default function LatencyDodgeGame({
                 {gameState === "gameover" ? (
                   <>
                     <span className="inline-block text-[10px] font-mono uppercase tracking-wider px-2.5 py-0.5 rounded border border-rose-800/60 bg-rose-950/40 text-rose-300">
-                      Node Overloaded
+                      Crash · Shield Depleted
                     </span>
                     <p className="text-2xl font-semibold text-white font-mono tabular-nums">
                       {score} pts
@@ -358,24 +505,21 @@ export default function LatencyDodgeGame({
                       className="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-zinc-950 font-semibold text-xs transition cursor-pointer"
                     >
                       <FiRotateCcw className="w-3.5 h-3.5" />
-                      <span>Play again</span>
+                      <span>Drive again</span>
                     </button>
                   </>
                 ) : (
                   <>
                     <div className="space-y-1.5">
                       <p className="text-base font-semibold text-white">
-                        Latency Dodge
+                        Latency Dodge · Highway Run
                       </p>
                       <p className="text-xs text-zinc-400 leading-relaxed">
-                        Evade incoming{" "}
-                        <span className="font-mono text-rose-400">
-                          502 / TIMEOUT / JITTER
-                        </span>{" "}
-                        spikes. Move with{" "}
+                        Steer your car down the road and dodge red traffic cars.
+                        Move with{" "}
                         <span className="font-mono text-zinc-200">← / →</span>,{" "}
                         <span className="font-mono text-zinc-200">A / D</span>,
-                        or drag.
+                        or pointer.
                       </p>
                     </div>
                     <button
@@ -384,7 +528,7 @@ export default function LatencyDodgeGame({
                       className="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-zinc-100 hover:bg-white text-zinc-950 font-semibold text-xs transition cursor-pointer"
                     >
                       <FiPlay className="w-3.5 h-3.5" />
-                      <span>Start game</span>
+                      <span>Start drive</span>
                     </button>
                   </>
                 )}

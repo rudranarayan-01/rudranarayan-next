@@ -344,7 +344,10 @@ export default function PacketRecoveryGame({
           ref={arenaRef}
           onPointerMove={handlePointerMove}
           onPointerDown={handlePointerMove}
-          className={`relative w-full rounded-xl border ${arenaBorderClass} bg-[#111114] overflow-hidden touch-none transition-colors duration-150 ${arenaHeightClass}`}
+          style={gameState === "playing" ? { cursor: "none" } : undefined}
+          className={`relative z-10 w-full rounded-xl border ${arenaBorderClass} bg-[#111114] overflow-hidden touch-none transition-colors duration-150 ${
+            gameState === "playing" ? "cursor-none" : ""
+          } ${arenaHeightClass}`}
         >
           {/* Subtle dot grid */}
           <div

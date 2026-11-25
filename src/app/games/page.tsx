@@ -14,6 +14,7 @@ import GridSweepGame from "../components/games/GridSweepGame";
 import ArcadeCharacters from "../components/games/ArcadeCharacters";
 import FlagCipherGame from "../components/games/FlagCipherGame";
 import StackGuesserGame from "../components/games/StackGuesserGame";
+import ChessGame from "../components/games/ChessGame";
 
 export default function GamesDashboardPage() {
   const [selectedBoardGameId, setSelectedBoardGameId] = useState<string>(
@@ -142,6 +143,8 @@ export default function GamesDashboardPage() {
                   <FlagCipherGame gameId="flag-cipher" compact />
                 ) : activePlayingGame.id === "stack-guesser" ? (
                   <StackGuesserGame gameId="stack-guesser" compact />
+                ) : activePlayingGame.id === "chess-tactics" ? (
+                  <ChessGame gameId="chess-tactics" compact/>
                 ) : (
                   <div className="border border-zinc-800 rounded-md bg-[#111114] h-80 flex items-center justify-center text-xs font-mono text-zinc-400">
                     {activePlayingGame.title} — not available yet.

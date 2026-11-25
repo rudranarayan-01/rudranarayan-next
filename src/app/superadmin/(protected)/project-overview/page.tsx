@@ -159,7 +159,7 @@ export default function ProjectOverviewPage() {
   }, [projectsData, selectedProject]);
 
   return (
-    <div className="p-6 md:p-10 max-w-7xl mx-auto space-y-8 bg-[#070709] text-neutral-100 min-h-screen font-sans">
+    <div className="p-6 md:p-10 max-w-7xl mx-auto space-y-8  text-neutral-100 min-h-screen font-sans">
       {/* HEADER & PROJECT SELECTOR */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center border-b border-white/10 pb-6 gap-4">
         <div>

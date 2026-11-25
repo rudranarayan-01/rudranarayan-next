@@ -1,267 +1,327 @@
+/* eslint-disable no-undef */
 "use client";
 
-import React, { useCallback, useEffect, useRef, useState } from "react";
-import { FiCheck, FiPlay, FiRotateCcw, FiX } from "react-icons/fi";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { FiCheck, FiHeart, FiPlay, FiRotateCcw, FiX } from "react-icons/fi";
 import Leaderboard from "./Leaderboard";
+
+/* ───────────────────────────── Types ───────────────────────────── */
 
 interface StackGuesserGameProps {
   gameId?: string;
   compact?: boolean;
 }
 
-interface TechLogoItem {
+type Group =
+  | "language"
+  | "frontend"
+  | "backend"
+  | "mobile"
+  | "ai"
+  | "database"
+  | "devops"
+  | "cloud"
+  | "tool";
+
+interface TechItem {
   id: string;
   name: string;
   category: string;
-  deviconSlug: string;
-  invertOnDark?: boolean;
-  fallbackSvg: () => React.ReactNode;
+  group: Group;
+  slug: string;
+  color: string;
+  /** Logo is dark on transparent — invert it so it shows on the dark UI. */
+  invert: boolean;
+}
+
+type ArtStyle = "normal" | "grayscale" | "silhouette" | "blurred";
+type GameState = "idle" | "playing" | "gameover";
+type ModeId = "all" | "code" | "infra";
+type Outcome = "cleared" | "eliminated";
+
+interface Level {
+  id: string;
+  name: string;
+  fromQuestion: number;
+  seconds: number;
+  multiplier: number;
+  art: ArtStyle;
+  artLabel: string;
+  /** Distractors come from the same group as the answer. */
+  confusable: boolean;
+  showCategoryHint: boolean;
+  badge: string;
 }
 
 interface LogoQuestion {
   index: number;
-  target: TechLogoItem;
-  options: TechLogoItem[];
+  level: Level;
+  target: TechItem;
+  options: TechItem[];
 }
 
 interface ChoiceFeedback {
-  selectedId: string;
+  selectedId: string | null;
   correctId: string;
   isCorrect: boolean;
+  timedOut: boolean;
   pointsEarned: number;
 }
 
-const TOTAL_QUESTIONS = 15;
-const ROUND_SECONDS = 60;
-const NAME_STORAGE_KEY = "portfolio_game_player_name";
+/* ───────────────────────────── Constants ───────────────────────────── */
 
-const TECH_LOGOS: TechLogoItem[] = [
+const TOTAL_QUESTIONS = 20;
+const STARTING_LIVES = 3;
+const SURVIVAL_BONUS = 25;
+const NAME_STORAGE_KEY = "portfolio_game_player_name";
+const DEVICON_BASE = "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons";
+
+const LEVELS: Level[] = [
   {
-    id: "react",
-    name: "React",
-    category: "Frontend Library",
-    deviconSlug: "react",
-    fallbackSvg: () => (
-      <svg viewBox="0 0 100 100" className="w-16 h-16 text-cyan-400">
-        <circle cx="50" cy="50" r="8" fill="currentColor" />
-        <ellipse cx="50" cy="50" rx="40" ry="15" fill="none" stroke="currentColor" strokeWidth="4" />
-        <ellipse cx="50" cy="50" rx="40" ry="15" fill="none" stroke="currentColor" strokeWidth="4" transform="rotate(60 50 50)" />
-        <ellipse cx="50" cy="50" rx="40" ry="15" fill="none" stroke="currentColor" strokeWidth="4" transform="rotate(120 50 50)" />
-      </svg>
-    ),
+    id: "warmup",
+    name: "Warm-up",
+    fromQuestion: 1,
+    seconds: 12,
+    multiplier: 1,
+    art: "normal",
+    artLabel: "Full colour",
+    confusable: false,
+    showCategoryHint: true,
+    badge: "border-emerald-500/40 bg-emerald-950/60 text-emerald-300",
   },
   {
-    id: "nextjs",
-    name: "Next.js",
-    category: "React Framework",
-    deviconSlug: "nextjs",
-    invertOnDark: true,
-    fallbackSvg: () => (
-      <svg viewBox="0 0 100 100" className="w-16 h-16">
-        <circle cx="50" cy="50" r="42" fill="#09090b" stroke="#e4e4e7" strokeWidth="4" />
-        <path d="M35 68 V32 L68 74" fill="none" stroke="#ffffff" strokeWidth="6" strokeLinecap="round" strokeLinejoin="round" />
-        <line x1="65" y1="32" x2="65" y2="54" stroke="#ffffff" strokeWidth="6" strokeLinecap="round" />
-      </svg>
-    ),
+    id: "developer",
+    name: "Developer",
+    fromQuestion: 6,
+    seconds: 9,
+    multiplier: 1.25,
+    art: "grayscale",
+    artLabel: "Greyscale",
+    confusable: true,
+    showCategoryHint: false,
+    badge: "border-sky-500/40 bg-sky-950/60 text-sky-300",
   },
   {
-    id: "typescript",
-    name: "TypeScript",
-    category: "Typed JavaScript",
-    deviconSlug: "typescript",
-    fallbackSvg: () => (
-      <svg viewBox="0 0 100 100" className="w-16 h-16">
-        <rect x="18" y="18" width="64" height="64" rx="10" fill="#2563eb" />
-        <text x="64" y="73" textAnchor="middle" fill="#ffffff" fontSize="30" fontWeight="bold" fontFamily="monospace">TS</text>
-      </svg>
-    ),
+    id: "architect",
+    name: "Architect",
+    fromQuestion: 11,
+    seconds: 7,
+    multiplier: 1.5,
+    art: "silhouette",
+    artLabel: "Silhouette",
+    confusable: true,
+    showCategoryHint: false,
+    badge: "border-violet-500/40 bg-violet-950/60 text-violet-300",
   },
   {
-    id: "nodejs",
-    name: "Node.js",
-    category: "Backend Runtime",
-    deviconSlug: "nodejs",
-    fallbackSvg: () => (
-      <svg viewBox="0 0 100 100" className="w-16 h-16">
-        <polygon points="50,14 82,32 82,68 50,86 18,68 18,32" fill="#16a34a" />
-        <text x="50" y="58" textAnchor="middle" fill="#ffffff" fontSize="24" fontWeight="bold" fontFamily="monospace">JS</text>
-      </svg>
-    ),
-  },
-  {
-    id: "express",
-    name: "Express",
-    category: "Node Web Framework",
-    deviconSlug: "express",
-    invertOnDark: true,
-    fallbackSvg: () => (
-      <div className="font-mono text-sm font-bold text-zinc-200">ex</div>
-    ),
-  },
-  {
-    id: "mongodb",
-    name: "MongoDB",
-    category: "NoSQL Database",
-    deviconSlug: "mongodb",
-    fallbackSvg: () => (
-      <svg viewBox="0 0 100 100" className="w-16 h-16">
-        <path d="M50 14 C65 32, 68 54, 52 76 L50 86 L48 76 C32 54, 35 32, 50 14 Z" fill="#10b981" />
-      </svg>
-    ),
-  },
-  {
-    id: "postgresql",
-    name: "PostgreSQL",
-    category: "Relational Database",
-    deviconSlug: "postgresql",
-    fallbackSvg: () => (
-      <div className="font-mono text-sm font-bold text-sky-400">PG</div>
-    ),
-  },
-  {
-    id: "redis",
-    name: "Redis",
-    category: "In-Memory Cache",
-    deviconSlug: "redis",
-    fallbackSvg: () => (
-      <svg viewBox="0 0 100 100" className="w-16 h-16 text-rose-500">
-        <polygon points="50,62 84,74 50,86 16,74" fill="#be123c" />
-        <polygon points="50,48 84,60 50,72 16,60" fill="#e11d48" />
-        <polygon points="50,34 84,46 50,58 16,46" fill="#f43f5e" />
-      </svg>
-    ),
-  },
-  {
-    id: "docker",
-    name: "Docker",
-    category: "Containerization",
-    deviconSlug: "docker",
-    fallbackSvg: () => (
-      <svg viewBox="0 0 100 100" className="w-16 h-16 text-sky-400">
-        <rect x="24" y="42" width="10" height="9" rx="1.5" fill="currentColor" />
-        <rect x="36" y="42" width="10" height="9" rx="1.5" fill="currentColor" />
-        <rect x="48" y="42" width="10" height="9" rx="1.5" fill="currentColor" />
-        <path d="M16 54 H78 C76 70, 62 78, 42 78 C24 78, 16 68, 16 54 Z" fill="currentColor" />
-      </svg>
-    ),
-  },
-  {
-    id: "kubernetes",
-    name: "Kubernetes",
-    category: "Container Orchestration",
-    deviconSlug: "kubernetes",
-    fallbackSvg: () => (
-      <div className="font-mono text-sm font-bold text-blue-400">K8s</div>
-    ),
-  },
-  {
-    id: "python",
-    name: "Python",
-    category: "Programming Language",
-    deviconSlug: "python",
-    fallbackSvg: () => (
-      <svg viewBox="0 0 100 100" className="w-16 h-16">
-        <path d="M49 18 C35 18, 34 25, 34 32 V40 H52 V44 H28 C21 44, 18 50, 18 58 C18 66, 22 70, 29 70 H34 V61 C34 54, 39 50, 46 50 H60 C65 50, 68 46, 68 41 V28 C68 21, 61 18, 49 18 Z" fill="#38bdf8" />
-        <path d="M51 82 C65 82, 66 75, 66 68 V60 H48 V56 H72 C79 56, 82 50, 82 42 C82 34, 78 30, 71 30 H66 V39 C66 46, 61 50, 54 50 H40 C35 50, 32 54, 32 59 V72 C32 79, 39 82, 51 82 Z" fill="#facc15" />
-      </svg>
-    ),
-  },
-  {
-    id: "tailwindcss",
-    name: "Tailwind CSS",
-    category: "Utility CSS",
-    deviconSlug: "tailwindcss",
-    fallbackSvg: () => (
-      <svg viewBox="0 0 100 100" className="w-16 h-16 text-cyan-400">
-        <path d="M34 42 C38 32, 46 28, 56 30 C62 31, 65 36, 70 40 C75 44, 80 44, 86 38 C82 48, 74 52, 64 50 C58 49, 55 44, 50 40 C45 36, 40 36, 34 42 Z" fill="currentColor" />
-        <path d="M14 62 C18 52, 26 48, 36 50 C42 51, 45 56, 50 60 C55 64, 60 64, 66 58 C62 68, 54 72, 44 70 C38 69, 35 64, 30 60 C25 56, 20 56, 14 62 Z" fill="currentColor" />
-      </svg>
-    ),
-  },
-  {
-    id: "graphql",
-    name: "GraphQL",
-    category: "API Query Layer",
-    deviconSlug: "graphql",
-    fallbackSvg: () => (
-      <svg viewBox="0 0 100 100" className="w-16 h-16 text-pink-500">
-        <polygon points="50,16 80,33 80,67 50,84 20,67 20,33" fill="none" stroke="currentColor" strokeWidth="3.5" />
-        <circle cx="50" cy="16" r="5" fill="currentColor" />
-        <circle cx="80" cy="33" r="5" fill="currentColor" />
-        <circle cx="80" cy="67" r="5" fill="currentColor" />
-        <circle cx="50" cy="84" r="5" fill="currentColor" />
-        <circle cx="20" cy="67" r="5" fill="currentColor" />
-        <circle cx="20" cy="33" r="5" fill="currentColor" />
-      </svg>
-    ),
-  },
-  {
-    id: "git",
-    name: "Git",
-    category: "Version Control",
-    deviconSlug: "git",
-    fallbackSvg: () => (
-      <div className="font-mono text-sm font-bold text-orange-400">GIT</div>
-    ),
-  },
-  {
-    id: "linux",
-    name: "Linux",
-    category: "Operating System",
-    deviconSlug: "linux",
-    fallbackSvg: () => (
-      <div className="font-mono text-sm font-bold text-amber-300">🐧</div>
-    ),
-  },
-  {
-    id: "rust",
-    name: "Rust",
-    category: "Systems Language",
-    deviconSlug: "rust",
-    invertOnDark: true,
-    fallbackSvg: () => (
-      <div className="font-mono text-sm font-bold text-orange-400">RS</div>
-    ),
-  },
-  {
-    id: "go",
-    name: "Go",
-    category: "Systems Language",
-    deviconSlug: "go",
-    fallbackSvg: () => (
-      <div className="font-mono text-sm font-bold text-cyan-400">GO</div>
-    ),
-  },
-  {
-    id: "firebase",
-    name: "Firebase",
-    category: "App Platform",
-    deviconSlug: "firebase",
-    fallbackSvg: () => (
-      <div className="font-mono text-sm font-bold text-amber-400">FB</div>
-    ),
-  },
-  {
-    id: "supabase",
-    name: "Supabase",
-    category: "Postgres Backend",
-    deviconSlug: "supabase",
-    fallbackSvg: () => (
-      <div className="font-mono text-sm font-bold text-emerald-400">SB</div>
-    ),
-  },
-  {
-    id: "tensorflow",
-    name: "TensorFlow",
-    category: "Machine Learning",
-    deviconSlug: "tensorflow",
-    fallbackSvg: () => (
-      <div className="font-mono text-sm font-bold text-orange-400">TF</div>
-    ),
+    id: "legend",
+    name: "Legend",
+    fromQuestion: 16,
+    seconds: 5,
+    multiplier: 2,
+    art: "blurred",
+    artLabel: "Blurred silhouette",
+    confusable: true,
+    showCategoryHint: false,
+    badge: "border-amber-500/40 bg-amber-950/60 text-amber-300",
   },
 ];
 
-function shuffleArray<T>(arr: T[]): T[] {
+const ART_FILTER: Record<ArtStyle, string> = {
+  normal: "",
+  grayscale: "grayscale",
+  silhouette: "brightness-0 invert",
+  blurred: "brightness-0 invert blur-[1.5px]",
+};
+
+const MODES: Array<{
+  id: ModeId;
+  label: string;
+  description: string;
+  groups: Group[] | null;
+}> = [
+  { id: "all", label: "Mixed", description: "Everything", groups: null },
+  {
+    id: "code",
+    label: "Code",
+    description: "Languages, frameworks, AI",
+    groups: ["language", "frontend", "backend", "mobile", "ai"],
+  },
+  {
+    id: "infra",
+    label: "Platforms & Infra",
+    description: "Cloud, DevOps, databases, tools",
+    groups: ["cloud", "devops", "database", "tool"],
+  },
+];
+
+/* ───────────────────────────── Logo data ───────────────────────────── */
+
+function t(
+  id: string,
+  name: string,
+  category: string,
+  group: Group,
+  color: string,
+  options: { slug?: string; invert?: boolean } = {},
+): TechItem {
+  return {
+    id,
+    name,
+    category,
+    group,
+    color,
+    slug: options.slug ?? id,
+    invert: options.invert ?? false,
+  };
+}
+
+const TECH_ITEMS: TechItem[] = [
+  // Languages
+  t("javascript", "JavaScript", "Scripting Language", "language", "#F7DF1E"),
+  t("typescript", "TypeScript", "Typed JavaScript", "language", "#3178C6"),
+  t("python", "Python", "Programming Language", "language", "#3776AB"),
+  t("java", "Java", "JVM Language", "language", "#E76F00"),
+  t("csharp", "C#", "Microsoft Language", "language", "#9B4F96"),
+  t("cplusplus", "C++", "Systems Language", "language", "#00599C"),
+  t("c", "C", "Systems Language", "language", "#A8B9CC"),
+  t("go", "Go", "Systems Language", "language", "#00ADD8"),
+  t("rust", "Rust", "Systems Language", "language", "#DEA584", { invert: true }),
+  t("kotlin", "Kotlin", "JVM / Android Language", "language", "#7F52FF"),
+  t("swift", "Swift", "Apple Language", "language", "#F05138"),
+  t("php", "PHP", "Server-side Language", "language", "#777BB4"),
+  t("ruby", "Ruby", "Dynamic Language", "language", "#CC342D"),
+  t("dart", "Dart", "Flutter Language", "language", "#0175C2"),
+  t("scala", "Scala", "JVM Language", "language", "#DC322F"),
+  t("elixir", "Elixir", "Functional Language", "language", "#8E6BB8"),
+  t("haskell", "Haskell", "Functional Language", "language", "#8F7FC4"),
+  t("lua", "Lua", "Embeddable Scripting", "language", "#5B6EE1"),
+  t("r", "R", "Statistics Language", "language", "#276DC3"),
+  t("julia", "Julia", "Scientific Computing", "language", "#9558B2"),
+  t("bash", "Bash", "Shell Scripting", "language", "#4EAA25"),
+
+  // Frontend
+  t("react", "React", "UI Library", "frontend", "#61DAFB"),
+  t("vuejs", "Vue.js", "UI Framework", "frontend", "#4FC08D"),
+  t("angular", "Angular", "Web Framework", "frontend", "#DD0031"),
+  t("svelte", "Svelte", "Compiler Framework", "frontend", "#FF3E00"),
+  t("nextjs", "Next.js", "React Framework", "frontend", "#E4E4E7", { invert: true }),
+  t("nuxtjs", "Nuxt", "Vue Framework", "frontend", "#00DC82"),
+  t("astro", "Astro", "Content Framework", "frontend", "#FF5D01"),
+  t("solidjs", "SolidJS", "Reactive UI Library", "frontend", "#4F88C6"),
+  t("gatsby", "Gatsby", "Static Site Generator", "frontend", "#A678E3"),
+  t("tailwindcss", "Tailwind CSS", "Utility CSS", "frontend", "#06B6D4"),
+  t("bootstrap", "Bootstrap", "CSS Framework", "frontend", "#7952B3"),
+  t("sass", "Sass", "CSS Preprocessor", "frontend", "#CC6699"),
+  t("vitejs", "Vite", "Build Tool", "frontend", "#646CFF"),
+  t("webpack", "Webpack", "Module Bundler", "frontend", "#8DD6F9"),
+  t("redux", "Redux", "State Management", "frontend", "#764ABC"),
+  t("threejs", "Three.js", "3D Graphics Library", "frontend", "#E4E4E7", { invert: true }),
+  t("jquery", "jQuery", "DOM Library", "frontend", "#0769AD"),
+  t("html5", "HTML5", "Markup Language", "frontend", "#E34F26"),
+  t("css3", "CSS3", "Styling Language", "frontend", "#1572B6"),
+
+  // Backend
+  t("nodejs", "Node.js", "JavaScript Runtime", "backend", "#339933"),
+  t("express", "Express", "Node Web Framework", "backend", "#E4E4E7", { invert: true }),
+  t("nestjs", "NestJS", "Node Framework", "backend", "#E0234E"),
+  t("fastify", "Fastify", "Node Framework", "backend", "#E4E4E7", { invert: true }),
+  t("django", "Django", "Python Framework", "backend", "#44B78B"),
+  t("flask", "Flask", "Python Micro-framework", "backend", "#E4E4E7", { invert: true }),
+  t("fastapi", "FastAPI", "Python API Framework", "backend", "#009688"),
+  t("spring", "Spring", "Java Framework", "backend", "#6DB33F"),
+  t("laravel", "Laravel", "PHP Framework", "backend", "#FF2D20"),
+  t("rails", "Ruby on Rails", "Ruby Framework", "backend", "#CC0000"),
+  t("dotnetcore", ".NET", "Microsoft Platform", "backend", "#512BD4"),
+  t("deno", "Deno", "JS / TS Runtime", "backend", "#E4E4E7", { invert: true }),
+  t("bun", "Bun", "JavaScript Runtime", "backend", "#FBF0DF"),
+  t("graphql", "GraphQL", "API Query Layer", "backend", "#E10098"),
+
+  // Mobile
+  t("flutter", "Flutter", "Cross-platform UI", "mobile", "#02569B"),
+  t("android", "Android", "Mobile OS", "mobile", "#3DDC84"),
+  t("ionic", "Ionic", "Hybrid Mobile", "mobile", "#3880FF"),
+
+  // AI & data
+  t("tensorflow", "TensorFlow", "Machine Learning", "ai", "#FF6F00"),
+  t("pytorch", "PyTorch", "Deep Learning", "ai", "#EE4C2C"),
+  t("numpy", "NumPy", "Numerical Computing", "ai", "#4DABCF"),
+  t("pandas", "pandas", "Data Analysis", "ai", "#8B7CF6"),
+  t("jupyter", "Jupyter", "Notebooks", "ai", "#F37626"),
+  t("scikitlearn", "scikit-learn", "ML Library", "ai", "#F7931E"),
+  t("opencv", "OpenCV", "Computer Vision", "ai", "#5C3EE8"),
+
+  // Databases & messaging
+  t("mongodb", "MongoDB", "NoSQL Database", "database", "#47A248"),
+  t("postgresql", "PostgreSQL", "Relational Database", "database", "#4169E1"),
+  t("mysql", "MySQL", "Relational Database", "database", "#4479A1"),
+  t("mariadb", "MariaDB", "Relational Database", "database", "#C0765A"),
+  t("sqlite", "SQLite", "Embedded Database", "database", "#44A5D9"),
+  t("redis", "Redis", "In-Memory Cache", "database", "#DC382D"),
+  t("cassandra", "Cassandra", "Wide-column Database", "database", "#1287B1"),
+  t("elasticsearch", "Elasticsearch", "Search Engine", "database", "#FED10A"),
+  t("neo4j", "Neo4j", "Graph Database", "database", "#018BFF"),
+  t("couchdb", "CouchDB", "Document Database", "database", "#E42528"),
+  t("dynamodb", "DynamoDB", "AWS NoSQL Database", "database", "#4053D6"),
+  t("kafka", "Apache Kafka", "Event Streaming", "database", "#E4E4E7", {
+    slug: "apachekafka",
+    invert: true,
+  }),
+  t("rabbitmq", "RabbitMQ", "Message Broker", "database", "#FF6600"),
+
+  // DevOps & operating systems
+  t("docker", "Docker", "Containerization", "devops", "#2496ED"),
+  t("kubernetes", "Kubernetes", "Container Orchestration", "devops", "#326CE5"),
+  t("terraform", "Terraform", "Infrastructure as Code", "devops", "#844FBA"),
+  t("ansible", "Ansible", "Configuration Automation", "devops", "#EE0000"),
+  t("jenkins", "Jenkins", "CI/CD Server", "devops", "#D24939"),
+  t("githubactions", "GitHub Actions", "CI/CD Workflows", "devops", "#2088FF"),
+  t("circleci", "CircleCI", "CI/CD Platform", "devops", "#E4E4E7", { invert: true }),
+  t("nginx", "NGINX", "Web Server / Proxy", "devops", "#009639"),
+  t("apache", "Apache", "Web Server", "devops", "#D22128"),
+  t("prometheus", "Prometheus", "Monitoring", "devops", "#E6522C"),
+  t("grafana", "Grafana", "Observability Dashboards", "devops", "#F46800"),
+  t("argocd", "Argo CD", "GitOps Delivery", "devops", "#EF7B4D"),
+  t("helm", "Helm", "Kubernetes Packages", "devops", "#6C7CFF"),
+  t("linux", "Linux", "Operating System", "devops", "#FCC624"),
+  t("ubuntu", "Ubuntu", "Linux Distribution", "devops", "#E95420"),
+  t("debian", "Debian", "Linux Distribution", "devops", "#E5516B"),
+  t("redhat", "Red Hat", "Enterprise Linux", "devops", "#EE0000"),
+
+  // Cloud & hosting platforms
+  t("aws", "AWS", "Cloud Platform", "cloud", "#FF9900", { slug: "amazonwebservices" }),
+  t("azure", "Microsoft Azure", "Cloud Platform", "cloud", "#0078D4"),
+  t("googlecloud", "Google Cloud", "Cloud Platform", "cloud", "#4285F4"),
+  t("vercel", "Vercel", "Frontend Cloud", "cloud", "#E4E4E7", { invert: true }),
+  t("netlify", "Netlify", "Jamstack Hosting", "cloud", "#00C7B7"),
+  t("cloudflare", "Cloudflare", "Edge Network / CDN", "cloud", "#F38020"),
+  t("heroku", "Heroku", "Platform as a Service", "cloud", "#7056BF"),
+  t("digitalocean", "DigitalOcean", "Cloud Provider", "cloud", "#0080FF"),
+  t("firebase", "Firebase", "App Platform", "cloud", "#FFCA28"),
+  t("supabase", "Supabase", "Postgres Backend", "cloud", "#3ECF8E"),
+  t("oracle", "Oracle Cloud", "Cloud & Database", "cloud", "#F80000"),
+
+  // Developer tools & code hosting
+  t("git", "Git", "Version Control", "tool", "#F05032"),
+  t("github", "GitHub", "Code Hosting", "tool", "#E4E4E7", { invert: true }),
+  t("gitlab", "GitLab", "DevOps Platform", "tool", "#FC6D26"),
+  t("bitbucket", "Bitbucket", "Code Hosting", "tool", "#2684FF"),
+  t("vscode", "VS Code", "Code Editor", "tool", "#007ACC"),
+  t("vim", "Vim", "Terminal Editor", "tool", "#019733"),
+  t("npm", "npm", "Package Manager", "tool", "#CB3837"),
+  t("yarn", "Yarn", "Package Manager", "tool", "#2C8EBB"),
+  t("pnpm", "pnpm", "Package Manager", "tool", "#F69220"),
+  t("postman", "Postman", "API Platform", "tool", "#FF6C37"),
+  t("figma", "Figma", "Design Platform", "tool", "#F24E1E"),
+  t("jira", "Jira", "Issue Tracking", "tool", "#4C9AFF"),
+  t("jest", "Jest", "JS Testing", "tool", "#C21325"),
+  t("cypress", "Cypress", "E2E Testing", "tool", "#69D3A7"),
+  t("selenium", "Selenium", "Browser Automation", "tool", "#43B02A"),
+];
+
+/* ───────────────────────────── Helpers ───────────────────────────── */
+
+function shuffle<T>(arr: T[]): T[] {
   const copy = [...arr];
   for (let i = copy.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
@@ -270,62 +330,144 @@ function shuffleArray<T>(arr: T[]): T[] {
   return copy;
 }
 
-function generateFifteenQuestions(): LogoQuestion[] {
-  const targets = shuffleArray(TECH_LOGOS).slice(0, TOTAL_QUESTIONS);
-
-  return targets.map((target, index) => {
-    const distractors = shuffleArray(
-      TECH_LOGOS.filter((item) => item.id !== target.id)
-    ).slice(0, 3);
-
-    const options = shuffleArray([target, ...distractors]);
-    return { index, target, options };
-  });
+function getPool(mode: ModeId): TechItem[] {
+  const groups = MODES.find((m) => m.id === mode)?.groups;
+  if (!groups) return TECH_ITEMS;
+  const pool = TECH_ITEMS.filter((item) => groups.includes(item.group));
+  return pool.length >= TOTAL_QUESTIONS ? pool : TECH_ITEMS;
 }
 
-function StackArtwork({ item }: { item: TechLogoItem }) {
-  const [imgFailed, setImgFailed] = useState(false);
-
-  useEffect(() => {
-    setImgFailed(false);
-  }, [item.id]);
-
-  if (imgFailed) {
-    return <>{item.fallbackSvg()}</>;
+function getLevel(questionIndex: number): Level {
+  const questionNumber = questionIndex + 1;
+  let level = LEVELS[0];
+  for (const candidate of LEVELS) {
+    if (questionNumber >= candidate.fromQuestion) level = candidate;
   }
+  return level;
+}
 
-  return (
-    <img
-      src={`https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/${item.deviconSlug}/${item.deviconSlug}-original.svg`}
-      alt={`${item.name} logo`}
-      onError={() => setImgFailed(true)}
-      className={`w-16 h-16 object-contain ${
-        item.invertOnDark ? "invert brightness-95" : ""
-      }`}
-      loading="eager"
-    />
+function pickDistractors(
+  target: TechItem,
+  pool: TechItem[],
+  confusable: boolean,
+): TechItem[] {
+  const others = shuffle(pool.filter((item) => item.id !== target.id));
+  if (!confusable) return others.slice(0, 3);
+
+  // Hard levels: look-alikes first (same group), then anything else.
+  const sameGroup = others.filter((item) => item.group === target.group);
+  const rest = others.filter((item) => item.group !== target.group);
+  return [...sameGroup, ...rest].slice(0, 3);
+}
+
+function buildDeck(mode: ModeId): LogoQuestion[] {
+  const pool = getPool(mode);
+  return shuffle(pool)
+    .slice(0, TOTAL_QUESTIONS)
+    .map((target, index) => {
+      const level = getLevel(index);
+      const options = shuffle([
+        target,
+        ...pickDistractors(target, pool, level.confusable),
+      ]);
+      return { index, level, target, options };
+    });
+}
+
+function getLogoSources(item: TechItem): string[] {
+  return (["original", "plain"] as const).map(
+    (variant) => `${DEVICON_BASE}/${item.slug}/${item.slug}-${variant}.svg`,
   );
 }
+
+function getInitials(name: string): string {
+  const words = name.replace(/[^a-zA-Z0-9\s]/g, " ").split(/\s+/).filter(Boolean);
+  if (words.length >= 2) return (words[0][0] + words[1][0]).toUpperCase();
+  return (words[0] ?? name).slice(0, 2);
+}
+
+/* ───────────────────────────── Artwork ───────────────────────────── */
+
+function MonogramLogo({ item }: { item: TechItem }) {
+  return (
+    <div
+      className="grid h-16 w-16 place-items-center rounded-xl text-xl font-bold"
+      style={{
+        color: item.color,
+        backgroundColor: `${item.color}22`,
+        border: `1px solid ${item.color}55`,
+      }}
+    >
+      {getInitials(item.name)}
+    </div>
+  );
+}
+
+function StackArtwork({
+  item,
+  art,
+  revealed,
+}: {
+  item: TechItem;
+  art: ArtStyle;
+  revealed: boolean;
+}) {
+  const sources = getLogoSources(item);
+  const [sourceIndex, setSourceIndex] = useState(0);
+  const [loaded, setLoaded] = useState(false);
+
+  if (sourceIndex >= sources.length) return <MonogramLogo item={item} />;
+
+  const effectiveArt: ArtStyle = revealed ? "normal" : art;
+  const needsInvert =
+    item.invert && (effectiveArt === "normal" || effectiveArt === "grayscale");
+  const filterClass = `${ART_FILTER[effectiveArt]} ${needsInvert ? "invert" : ""}`;
+
+  return (
+    <div className="relative grid h-20 w-20 place-items-center">
+      {!loaded && (
+        <div className="absolute inset-0 animate-pulse rounded-xl bg-zinc-800/60" />
+      )}
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        key={sources[sourceIndex]}
+        src={sources[sourceIndex]}
+        alt={revealed ? `${item.name} logo` : "Mystery tech logo"}
+        onLoad={() => setLoaded(true)}
+        onError={() => {
+          setLoaded(false);
+          setSourceIndex((index) => index + 1);
+        }}
+        className={`h-20 w-20 object-contain transition-[filter,opacity] duration-300 ${filterClass} ${
+          loaded ? "opacity-100" : "opacity-0"
+        }`}
+        loading="eager"
+        draggable={false}
+      />
+    </div>
+  );
+}
+
+/* ───────────────────────────── Game ───────────────────────────── */
 
 export default function StackGuesserGame({
   gameId = "stack-guesser",
   compact = false,
 }: StackGuesserGameProps) {
-  const [gameState, setGameState] = useState<"idle" | "playing" | "gameover">(
-    "idle"
-  );
-  const [questions, setQuestions] = useState<LogoQuestion[]>(() =>
-    generateFifteenQuestions()
-  );
+  const [gameState, setGameState] = useState<GameState>("idle");
+  const [mode, setMode] = useState<ModeId>("all");
+  const [questions, setQuestions] = useState<LogoQuestion[]>([]);
   const [currentIdx, setCurrentIdx] = useState(0);
-  const [timeLeft, setTimeLeft] = useState(ROUND_SECONDS);
+  const [timeLeftMs, setTimeLeftMs] = useState(0);
   const [score, setScore] = useState(0);
   const [bestScore, setBestScore] = useState(0);
   const [correctCount, setCorrectCount] = useState(0);
   const [streak, setStreak] = useState(0);
-  const [choiceFeedback, setChoiceFeedback] = useState<ChoiceFeedback | null>(
-    null
-  );
+  const [bestStreak, setBestStreak] = useState(0);
+  const [lives, setLives] = useState(STARTING_LIVES);
+  const [outcome, setOutcome] = useState<Outcome>("eliminated");
+  const [survivalBonus, setSurvivalBonus] = useState(0);
+  const [choiceFeedback, setChoiceFeedback] = useState<ChoiceFeedback | null>(null);
 
   const [playerName, setPlayerName] = useState("");
   const [submittingScore, setSubmittingScore] = useState(false);
@@ -335,8 +477,15 @@ export default function StackGuesserGame({
 
   const nameInputRef = useRef<HTMLInputElement | null>(null);
   const advanceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const deadlineRef = useRef(0);
+  const lockedRef = useRef(false);
   const scoreRef = useRef(0);
   const streakRef = useRef(0);
+  const bestStreakRef = useRef(0);
+  const livesRef = useRef(STARTING_LIVES);
+
+  const currentQuestion: LogoQuestion | undefined = questions[currentIdx];
+  const currentLevel = currentQuestion?.level ?? LEVELS[0];
 
   const clearAdvanceTimer = useCallback(() => {
     if (advanceTimerRef.current) {
@@ -345,10 +494,9 @@ export default function StackGuesserGame({
     }
   }, []);
 
-  useEffect(() => {
-    return () => clearAdvanceTimer();
-  }, [clearAdvanceTimer]);
+  useEffect(() => clearAdvanceTimer, [clearAdvanceTimer]);
 
+  /* Restore name + best score */
   useEffect(() => {
     try {
       const savedName = localStorage.getItem(NAME_STORAGE_KEY);
@@ -356,128 +504,179 @@ export default function StackGuesserGame({
       const savedBest = localStorage.getItem(`best_${gameId}`);
       if (savedBest) setBestScore(Number(savedBest) || 0);
     } catch {
-      // Ignore storage errors
+      // storage unavailable
     }
   }, [gameId]);
 
-  const finishRound = useCallback(
-    (finalScore: number) => {
-      clearAdvanceTimer();
-      setChoiceFeedback(null);
-      setGameState("gameover");
-      setBestScore((prev) => {
-        const updated = Math.max(prev, finalScore);
-        try {
-          localStorage.setItem(`best_${gameId}`, String(updated));
-        } catch {
-          // Ignore storage errors
-        }
-        return updated;
-      });
-    },
-    [clearAdvanceTimer, gameId]
-  );
+  useEffect(() => {
+    if (bestScore <= 0) return;
+    try {
+      localStorage.setItem(`best_${gameId}`, String(bestScore));
+    } catch {
+      // storage unavailable
+    }
+  }, [bestScore, gameId]);
+
+  /* Round lifecycle */
+  const finishRound = (cleared: boolean) => {
+    clearAdvanceTimer();
+    const bonus = cleared ? livesRef.current * SURVIVAL_BONUS : 0;
+    scoreRef.current += bonus;
+
+    setScore(scoreRef.current);
+    setSurvivalBonus(bonus);
+    setOutcome(cleared ? "cleared" : "eliminated");
+    setBestStreak(bestStreakRef.current);
+    setChoiceFeedback(null);
+    setBestScore((prev) => Math.max(prev, scoreRef.current));
+    setGameState("gameover");
+  };
 
   const startGame = () => {
     clearAdvanceTimer();
-    const deck = generateFifteenQuestions();
-    setQuestions(deck);
+    setQuestions(buildDeck(mode));
     setCurrentIdx(0);
-    setTimeLeft(ROUND_SECONDS);
     setScore(0);
-    scoreRef.current = 0;
-    streakRef.current = 0;
     setCorrectCount(0);
     setStreak(0);
+    setBestStreak(0);
+    setLives(STARTING_LIVES);
+    setSurvivalBonus(0);
     setChoiceFeedback(null);
     setSubmittedScore(null);
     setSubmitError(null);
+    scoreRef.current = 0;
+    streakRef.current = 0;
+    bestStreakRef.current = 0;
+    livesRef.current = STARTING_LIVES;
+    lockedRef.current = false;
     setGameState("playing");
   };
 
-  useEffect(() => {
-    if (gameState !== "playing") return;
+  const resolveAnswer = (chosen: TechItem | null) => {
+    const question = questions[currentIdx];
+    if (gameState !== "playing" || !question || lockedRef.current) return;
+    lockedRef.current = true;
 
-    const interval = setInterval(() => {
-      setTimeLeft((prev) => {
-        if (prev <= 1) {
-          clearInterval(interval);
-          finishRound(scoreRef.current);
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, 1000);
+    const isCorrect = chosen?.id === question.target.id;
+    let pointsEarned = 0;
+    let livesAfter = livesRef.current;
 
-    return () => clearInterval(interval);
-  }, [finishRound, gameState]);
+    if (isCorrect) {
+      const durationMs = question.level.seconds * 1000;
+      const remainingMs = Math.max(0, deadlineRef.current - Date.now());
+      const nextStreak = streakRef.current + 1;
+      const streakBonus = Math.min(15, (nextStreak - 1) * 3);
+      const speedBonus = Math.floor((remainingMs / durationMs) * 10);
+      pointsEarned = Math.round(
+        (20 + streakBonus + speedBonus) * question.level.multiplier,
+      );
 
-  const currentQuestion = questions[currentIdx];
+      scoreRef.current += pointsEarned;
+      streakRef.current = nextStreak;
+      bestStreakRef.current = Math.max(bestStreakRef.current, nextStreak);
 
-  const handleSelect = useCallback(
-    (chosen: TechLogoItem) => {
-      if (gameState !== "playing" || choiceFeedback || !currentQuestion) return;
+      setScore(scoreRef.current);
+      setStreak(nextStreak);
+      setCorrectCount((count) => count + 1);
+    } else {
+      streakRef.current = 0;
+      livesAfter = Math.max(0, livesRef.current - 1);
+      livesRef.current = livesAfter;
 
-      const isCorrect = chosen.id === currentQuestion.target.id;
-      let pointsEarned = 0;
+      setStreak(0);
+      setLives(livesAfter);
+    }
 
-      if (isCorrect) {
-        const nextStreak = streakRef.current + 1;
-        const streakBonus = Math.min(15, (nextStreak - 1) * 3);
-        const speedBonus = Math.floor((timeLeft / ROUND_SECONDS) * 10);
-        pointsEarned = 20 + streakBonus + speedBonus;
+    setChoiceFeedback({
+      selectedId: chosen?.id ?? null,
+      correctId: question.target.id,
+      isCorrect,
+      timedOut: chosen === null,
+      pointsEarned,
+    });
 
-        const nextScore = scoreRef.current + pointsEarned;
-        scoreRef.current = nextScore;
-        streakRef.current = nextStreak;
-
-        setScore(nextScore);
-        setStreak(nextStreak);
-        setCorrectCount((c) => c + 1);
-      } else {
-        streakRef.current = 0;
-        setStreak(0);
-      }
-
-      setChoiceFeedback({
-        selectedId: chosen.id,
-        correctId: currentQuestion.target.id,
-        isCorrect,
-        pointsEarned,
-      });
-
-      advanceTimerRef.current = setTimeout(() => {
+    advanceTimerRef.current = setTimeout(
+      () => {
         setChoiceFeedback(null);
-        if (currentIdx + 1 >= TOTAL_QUESTIONS) {
-          finishRound(scoreRef.current);
+        if (livesAfter <= 0) {
+          finishRound(false);
+        } else if (currentIdx + 1 >= TOTAL_QUESTIONS) {
+          finishRound(true);
         } else {
           setCurrentIdx((idx) => idx + 1);
         }
-      }, isCorrect ? 650 : 1250);
-    },
-    [choiceFeedback, currentIdx, currentQuestion, finishRound, gameState, timeLeft]
-  );
+      },
+      isCorrect ? 700 : 1500,
+    );
+  };
 
+  // Always-current references for the timer and keyboard handlers.
+  const resolveRef = useRef(resolveAnswer);
+  resolveRef.current = resolveAnswer;
+  const startRef = useRef(startGame);
+  startRef.current = startGame;
+
+  /* Per-question countdown */
   useEffect(() => {
-    if (gameState !== "playing") return;
+    if (gameState !== "playing" || !currentQuestion) return;
 
-    const onKeyDown = (e: KeyboardEvent) => {
-      if (
-        document.activeElement?.tagName === "INPUT" ||
-        document.activeElement?.tagName === "TEXTAREA"
-      ) {
+    lockedRef.current = false;
+    const durationMs = currentQuestion.level.seconds * 1000;
+    deadlineRef.current = Date.now() + durationMs;
+    setTimeLeftMs(durationMs);
+
+    const interval = setInterval(() => {
+      if (lockedRef.current) {
+        clearInterval(interval);
         return;
       }
-      const idx = ["1", "2", "3", "4"].indexOf(e.key);
-      if (idx !== -1 && currentQuestion?.options[idx]) {
-        handleSelect(currentQuestion.options[idx]);
+      const remaining = deadlineRef.current - Date.now();
+      if (remaining <= 0) {
+        clearInterval(interval);
+        setTimeLeftMs(0);
+        resolveRef.current(null);
+        return;
+      }
+      setTimeLeftMs(remaining);
+    }, 100);
+
+    return () => clearInterval(interval);
+  }, [gameState, currentIdx, currentQuestion]);
+
+  /* Preload the next two logos so they never pop in */
+  useEffect(() => {
+    if (gameState !== "playing") return;
+    questions.slice(currentIdx + 1, currentIdx + 3).forEach((question) => {
+      const image = new Image();
+      image.src = getLogoSources(question.target)[0];
+    });
+  }, [gameState, questions, currentIdx]);
+
+  /* Keyboard: 1–4 to answer, Enter to start / replay */
+  useEffect(() => {
+    const onKeyDown = (e: KeyboardEvent) => {
+      const tag = document.activeElement?.tagName;
+      if (tag === "INPUT" || tag === "TEXTAREA") return;
+
+      if (gameState === "playing") {
+        const idx = ["1", "2", "3", "4"].indexOf(e.key);
+        const option = idx === -1 ? undefined : currentQuestion?.options[idx];
+        if (option) resolveRef.current(option);
+        return;
+      }
+
+      if (e.key === "Enter" && tag !== "BUTTON") {
+        e.preventDefault();
+        startRef.current();
       }
     };
 
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, [currentQuestion, gameState, handleSelect]);
+  }, [gameState, currentQuestion]);
 
+  /* Score submission */
   const handleScoreSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const trimmed = playerName.trim();
@@ -506,7 +705,7 @@ export default function StackGuesserGame({
       try {
         localStorage.setItem(NAME_STORAGE_KEY, trimmed);
       } catch {
-        // Ignore storage errors
+        // storage unavailable
       }
 
       setSubmittedScore(score);
@@ -518,120 +717,172 @@ export default function StackGuesserGame({
     }
   };
 
-  const arenaMinHeight = compact
-    ? "min-h-[24rem]"
-    : "min-h-[27rem] lg:min-h-[30rem]";
-
-  const timeProgressPercent = Math.max(0, (timeLeft / ROUND_SECONDS) * 100);
+  /* Derived UI values */
+  const questionDurationMs = currentLevel.seconds * 1000;
+  const timePercent = Math.max(0, Math.min(100, (timeLeftMs / questionDurationMs) * 100));
+  const secondsLeft = Math.ceil(timeLeftMs / 1000);
+  const isLowTime = timeLeftMs <= 3000 && !choiceFeedback;
+  const arenaMinHeight = compact ? "min-h-[26rem]" : "min-h-[30rem] lg:min-h-[34rem]";
+  const revealed = Boolean(choiceFeedback);
+  const poolSizes = Object.fromEntries(MODES.map((m) => [m.id, getPool(m.id).length]));
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start select-none">
-      <div className="lg:col-span-7 xl:col-span-8 space-y-4">
-        {/* HUD Telemetry Bar */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 border border-zinc-800 rounded-xl bg-[#111114] divide-y sm:divide-y-0 sm:divide-x divide-zinc-800 text-xs font-mono overflow-hidden">
+    <div className="grid select-none grid-cols-1 items-start gap-5 lg:grid-cols-12">
+      <div className="space-y-4 lg:col-span-7 xl:col-span-8">
+        {/* HUD */}
+        <div className="grid grid-cols-2 divide-y divide-zinc-800 overflow-hidden rounded-xl border border-zinc-800 bg-[#111114] font-mono text-xs sm:grid-cols-4 sm:divide-x sm:divide-y-0">
           <div className="px-4 py-3">
-            <span className="text-zinc-500 block text-[10px]">SCORE</span>
-            <span className="text-white font-semibold text-base tabular-nums">
-              {score}
-            </span>
+            <span className="block text-[10px] text-zinc-500">SCORE</span>
+            <span className="text-base font-semibold tabular-nums text-white">{score}</span>
           </div>
           <div className="px-4 py-3">
-            <span className="text-zinc-500 block text-[10px]">QUESTION</span>
-            <span className="text-zinc-200 font-semibold text-base tabular-nums">
+            <span className="block text-[10px] text-zinc-500">QUESTION</span>
+            <span className="text-base font-semibold tabular-nums text-zinc-200">
               {gameState === "idle"
                 ? `0/${TOTAL_QUESTIONS}`
                 : `${Math.min(currentIdx + 1, TOTAL_QUESTIONS)}/${TOTAL_QUESTIONS}`}
             </span>
           </div>
           <div className="px-4 py-3">
-            <span className="text-zinc-500 block text-[10px]">STREAK</span>
-            <span className="text-amber-300 font-semibold text-base tabular-nums">
-              {streak}x
-            </span>
+            <span className="block text-[10px] text-zinc-500">STREAK</span>
+            <span className="text-base font-semibold tabular-nums text-amber-300">{streak}x</span>
           </div>
           <div className="px-4 py-3">
-            <span className="text-zinc-500 block text-[10px]">TIME LEFT</span>
+            <span className="block text-[10px] text-zinc-500">LIVES</span>
             <span
-              className={`font-semibold text-base tabular-nums ${
-                timeLeft <= 10 ? "text-rose-400" : "text-emerald-400"
-              }`}
+              className="mt-0.5 flex items-center gap-1"
+              aria-label={`${lives} of ${STARTING_LIVES} lives left`}
             >
-              {timeLeft}s
+              {Array.from({ length: STARTING_LIVES }, (_, i) => (
+                <FiHeart
+                  key={i}
+                  className={`h-4 w-4 transition-colors ${
+                    i < lives ? "fill-rose-500 text-rose-500" : "text-zinc-700"
+                  }`}
+                />
+              ))}
             </span>
           </div>
         </div>
 
-        {/* 60-Second Timer Progress Strip */}
-        <div className="h-1.5 w-full rounded-full bg-zinc-900 overflow-hidden border border-zinc-800/80">
+        {/* Question timer */}
+        <div className="flex items-center gap-3">
           <div
-            style={{ width: `${timeProgressPercent}%` }}
-            className={`h-full transition-all duration-500 ${
-              timeLeft <= 10 ? "bg-rose-500" : "bg-emerald-400"
+            role="progressbar"
+            aria-label="Time left for this question"
+            aria-valuemin={0}
+            aria-valuemax={100}
+            aria-valuenow={Math.round(timePercent)}
+            className="h-2 flex-1 overflow-hidden rounded-full border border-zinc-800/80 bg-zinc-900"
+          >
+            <div
+              style={{ width: `${gameState === "playing" ? timePercent : 0}%` }}
+              className={`h-full transition-[width] duration-100 ease-linear ${
+                isLowTime ? "bg-rose-500" : "bg-emerald-400"
+              }`}
+            />
+          </div>
+          <span
+            className={`w-8 text-right font-mono text-xs font-semibold tabular-nums ${
+              isLowTime ? "text-rose-400" : "text-zinc-300"
             }`}
-          />
+          >
+            {gameState === "playing" ? `${secondsLeft}s` : "–"}
+          </span>
         </div>
 
-        {/* Main Game Stage */}
+        {/* Stage */}
         <div
-          className={`relative w-full rounded-xl border border-zinc-800 bg-[#111114] p-5 sm:p-7 flex flex-col items-center justify-center ${arenaMinHeight}`}
+          className={`relative flex w-full flex-col items-center justify-center rounded-xl border border-zinc-800 bg-[#111114] p-5 sm:p-7 ${arenaMinHeight}`}
         >
           {gameState === "playing" && currentQuestion ? (
-            <div className="w-full max-w-lg space-y-6">
-              <div className="flex items-center justify-between text-[11px] font-mono text-zinc-400">
-                <span>
-                  Q{currentIdx + 1} of {TOTAL_QUESTIONS} ·{" "}
-                  <span className="text-zinc-500">
-                    {currentQuestion.target.category}
+            <div className="w-full max-w-lg space-y-5">
+              <div className="flex flex-wrap items-center justify-between gap-2 font-mono text-[11px]">
+                <div className="flex items-center gap-2">
+                  <span
+                    className={`rounded border px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider ${currentLevel.badge}`}
+                  >
+                    {currentLevel.name} · x{currentLevel.multiplier}
                   </span>
-                </span>
+                  {currentLevel.art !== "normal" && (
+                    <span className="rounded border border-zinc-800 bg-zinc-950 px-2 py-0.5 text-[10px] text-zinc-400">
+                      {currentLevel.artLabel}
+                    </span>
+                  )}
+                </div>
                 <span className="text-zinc-500">Keys 1–4 or click</span>
               </div>
 
-              <div className="flex flex-col items-center">
-                <div className="w-28 h-28 rounded-2xl bg-zinc-950 border border-zinc-800 flex items-center justify-center shadow-lg">
-                  <StackArtwork item={currentQuestion.target} />
+              <div className="flex flex-col items-center gap-2">
+                <div
+                  className={`flex h-32 w-32 items-center justify-center rounded-2xl border bg-zinc-950 shadow-lg transition-colors duration-200 ${
+                    choiceFeedback
+                      ? choiceFeedback.isCorrect
+                        ? "border-emerald-500/70 shadow-emerald-500/10"
+                        : "border-rose-500/70 shadow-rose-500/10"
+                      : "border-zinc-800"
+                  }`}
+                >
+                  <StackArtwork
+                    key={currentQuestion.target.id}
+                    item={currentQuestion.target}
+                    art={currentLevel.art}
+                    revealed={revealed}
+                  />
                 </div>
+                <p className="h-4 font-mono text-[11px] text-zinc-500">
+                  {currentLevel.showCategoryHint
+                    ? currentQuestion.target.category
+                    : revealed
+                      ? currentQuestion.target.category
+                      : "Hint hidden at this level"}
+                </p>
               </div>
 
-              {/* Instant Feedback Banner */}
-              <div className="min-h-[28px] flex items-center justify-center">
+              {/* Feedback */}
+              <div className="flex min-h-[28px] items-center justify-center" aria-live="polite">
                 {choiceFeedback ? (
                   choiceFeedback.isCorrect ? (
-                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-950/70 border border-emerald-500/40 text-emerald-300 text-xs font-mono">
-                      <FiCheck className="w-3.5 h-3.5" />
+                    <div className="inline-flex items-center gap-2 rounded-full border border-emerald-500/40 bg-emerald-950/70 px-3 py-1 font-mono text-xs text-emerald-300">
+                      <FiCheck className="h-3.5 w-3.5" />
                       <span>Correct! +{choiceFeedback.pointsEarned} pts</span>
                     </div>
                   ) : (
-                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-rose-950/70 border border-rose-500/40 text-rose-300 text-xs font-mono">
-                      <FiX className="w-3.5 h-3.5" />
+                    <div className="inline-flex items-center gap-2 rounded-full border border-rose-500/40 bg-rose-950/70 px-3 py-1 font-mono text-xs text-rose-300">
+                      <FiX className="h-3.5 w-3.5" />
                       <span>
-                        You picked{" "}
-                        <strong className="text-rose-200">
-                          {
-                            currentQuestion.options.find(
-                              (o) => o.id === choiceFeedback.selectedId
-                            )?.name
-                          }
-                        </strong>{" "}
+                        {choiceFeedback.timedOut ? (
+                          "Time's up"
+                        ) : (
+                          <>
+                            You picked{" "}
+                            <strong className="text-rose-200">
+                              {
+                                currentQuestion.options.find(
+                                  (o) => o.id === choiceFeedback.selectedId,
+                                )?.name
+                              }
+                            </strong>
+                          </>
+                        )}{" "}
                         · Answer:{" "}
                         <strong className="text-emerald-300">
                           {currentQuestion.target.name}
-                        </strong>
+                        </strong>{" "}
+                        · −1 life
                       </span>
                     </div>
                   )
                 ) : (
-                  <p className="text-xs font-mono text-zinc-500">
-                    Identify this stack or tool
-                  </p>
+                  <p className="font-mono text-xs text-zinc-500">Identify this logo</p>
                 )}
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {/* Options */}
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                 {currentQuestion.options.map((opt, idx) => {
                   const isSelected = choiceFeedback?.selectedId === opt.id;
-                  const isCorrectOption =
-                    choiceFeedback?.correctId === opt.id;
+                  const isCorrectOption = choiceFeedback?.correctId === opt.id;
 
                   let buttonStyle =
                     "bg-zinc-950 hover:bg-zinc-900 border-zinc-800 hover:border-zinc-600 text-zinc-100";
@@ -641,11 +892,10 @@ export default function StackGuesserGame({
                       buttonStyle =
                         "bg-emerald-950/80 border-emerald-500 text-emerald-200 ring-1 ring-emerald-500/40";
                     } else if (isSelected && !choiceFeedback.isCorrect) {
-                      buttonStyle =
-                        "bg-rose-950/80 border-rose-500 text-rose-200";
+                      buttonStyle = "bg-rose-950/80 border-rose-500 text-rose-200";
                     } else {
                       buttonStyle =
-                        "bg-zinc-950/50 border-zinc-800/60 text-zinc-500 opacity-65";
+                        "bg-zinc-950/50 border-zinc-800/60 text-zinc-500 opacity-60";
                     }
                   }
 
@@ -654,92 +904,192 @@ export default function StackGuesserGame({
                       key={opt.id}
                       type="button"
                       disabled={Boolean(choiceFeedback)}
-                      onClick={() => handleSelect(opt)}
-                      className={`px-4 py-3 rounded-xl border text-xs font-mono flex items-center justify-between gap-2.5 transition-all cursor-pointer disabled:cursor-default ${buttonStyle}`}
+                      onClick={() => resolveAnswer(opt)}
+                      aria-label={`Option ${idx + 1}: ${opt.name}`}
+                      className={`flex cursor-pointer items-center justify-between gap-2.5 rounded-xl border px-4 py-3 font-mono text-xs transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/60 enabled:active:scale-[0.98] disabled:cursor-default ${buttonStyle}`}
                     >
-                      <span className="flex items-center gap-2.5 min-w-0">
-                        <span className="px-1.5 py-0.5 rounded bg-zinc-900 border border-zinc-800 text-[10px] text-zinc-400 shrink-0">
+                      <span className="flex min-w-0 items-center gap-2.5">
+                        <span className="shrink-0 rounded border border-zinc-800 bg-zinc-900 px-1.5 py-0.5 text-[10px] text-zinc-400">
                           {idx + 1}
                         </span>
-                        <span className="font-medium truncate">{opt.name}</span>
+                        <span className="truncate font-medium">{opt.name}</span>
                       </span>
 
                       {choiceFeedback && isCorrectOption && (
-                        <span className="text-[10px] uppercase font-bold text-emerald-400 shrink-0">
+                        <span className="shrink-0 text-[10px] font-bold uppercase text-emerald-400">
                           Correct
                         </span>
                       )}
-                      {choiceFeedback &&
-                        isSelected &&
-                        !choiceFeedback.isCorrect && (
-                          <span className="text-[10px] uppercase font-bold text-rose-400 shrink-0">
-                            Picked
-                          </span>
-                        )}
+                      {choiceFeedback && isSelected && !choiceFeedback.isCorrect && (
+                        <span className="shrink-0 text-[10px] font-bold uppercase text-rose-400">
+                          Picked
+                        </span>
+                      )}
                     </button>
                   );
                 })}
               </div>
             </div>
           ) : gameState === "gameover" ? (
-            <div className="w-full max-w-sm rounded-2xl border border-zinc-800 bg-zinc-950/95 p-6 text-center space-y-4">
-              <span className="inline-block text-[10px] font-mono uppercase tracking-wider px-2.5 py-0.5 rounded border border-emerald-800/60 bg-emerald-950/40 text-emerald-300">
-                Round Complete
+            <div className="w-full max-w-sm space-y-5 rounded-2xl border border-zinc-800 bg-zinc-950/95 p-6 text-center">
+              <span
+                className={`inline-block rounded border px-2.5 py-0.5 font-mono text-[10px] uppercase tracking-wider ${
+                  outcome === "cleared"
+                    ? "border-emerald-800/60 bg-emerald-950/40 text-emerald-300"
+                    : "border-rose-800/60 bg-rose-950/40 text-rose-300"
+                }`}
+              >
+                {outcome === "cleared"
+                  ? "All 20 cleared"
+                  : `Eliminated at Q${Math.min(currentIdx + 1, TOTAL_QUESTIONS)} · ${currentLevel.name}`}
               </span>
+
               <div className="space-y-1">
-                <p className="text-3xl font-semibold text-white font-mono tabular-nums">
-                  {score} pts
+                <p className="font-mono text-4xl font-semibold tabular-nums text-white">
+                  {score} <span className="text-lg text-zinc-500">pts</span>
                 </p>
-                <p className="text-xs font-mono text-zinc-400 tabular-nums">
-                  Accuracy: {correctCount}/{TOTAL_QUESTIONS} · Best: {bestScore}
-                </p>
+                {survivalBonus > 0 && (
+                  <p className="font-mono text-[11px] text-emerald-400">
+                    Includes +{survivalBonus} survival bonus
+                  </p>
+                )}
               </div>
+
+              <div className="grid grid-cols-3 divide-x divide-zinc-800 rounded-lg border border-zinc-800 font-mono">
+                <div className="px-2 py-2.5">
+                  <span className="block text-[10px] text-zinc-500">CORRECT</span>
+                  <span className="text-sm font-semibold tabular-nums text-zinc-200">
+                    {correctCount}/{TOTAL_QUESTIONS}
+                  </span>
+                </div>
+                <div className="px-2 py-2.5">
+                  <span className="block text-[10px] text-zinc-500">BEST STREAK</span>
+                  <span className="text-sm font-semibold tabular-nums text-amber-300">
+                    {bestStreak}x
+                  </span>
+                </div>
+                <div className="px-2 py-2.5">
+                  <span className="block text-[10px] text-zinc-500">BEST SCORE</span>
+                  <span className="text-sm font-semibold tabular-nums text-emerald-300">
+                    {bestScore}
+                  </span>
+                </div>
+              </div>
+
               <button
                 type="button"
                 onClick={startGame}
-                className="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-zinc-950 font-semibold text-xs font-mono transition cursor-pointer"
+                className="inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg bg-emerald-500 px-4 py-2.5 font-mono text-xs font-semibold text-zinc-950 transition hover:bg-emerald-400"
               >
-                <FiRotateCcw className="w-3.5 h-3.5" />
-                <span>Play 15 new stacks</span>
+                <FiRotateCcw className="h-3.5 w-3.5" />
+                <span>Play again · {MODES.find((m) => m.id === mode)?.label}</span>
               </button>
+
+              <div className="flex flex-wrap justify-center gap-1.5">
+                {MODES.map((m) => (
+                  <button
+                    key={m.id}
+                    type="button"
+                    onClick={() => setMode(m.id)}
+                    className={`cursor-pointer rounded-md border px-2.5 py-1 font-mono text-[10px] transition ${
+                      mode === m.id
+                        ? "border-emerald-500/60 bg-emerald-950/50 text-emerald-300"
+                        : "border-zinc-800 text-zinc-400 hover:border-zinc-600"
+                    }`}
+                  >
+                    {m.label}
+                  </button>
+                ))}
+              </div>
             </div>
           ) : (
-            <div className="w-full max-w-sm rounded-2xl border border-zinc-800 bg-zinc-950/90 p-6 text-center space-y-4">
-              <div className="space-y-1.5">
-                <p className="text-base font-semibold text-white">
-                  Stack Guesser · 15-Stack Sprint
-                </p>
-                <p className="text-xs text-zinc-400 leading-relaxed">
-                  Identify{" "}
-                  <span className="font-mono text-zinc-200">
-                    15 non-repeating developer stacks
-                  </span>{" "}
-                  within{" "}
-                  <span className="font-mono text-zinc-200">60 seconds</span>.
-                  Wrong picks immediately highlight the right answer.
+            <div className="w-full max-w-md space-y-5 rounded-2xl border border-zinc-800 bg-zinc-950/90 p-6">
+              <div className="space-y-1.5 text-center">
+                <p className="text-base font-semibold text-white">Stack Guesser · Hardcore</p>
+                <p className="text-xs leading-relaxed text-zinc-400">
+                  Name{" "}
+                  <span className="font-mono text-zinc-200">20 logos</span> before you run out
+                  of <span className="font-mono text-zinc-200">3 lives</span>. Every level is
+                  faster and the logos get harder to read.
                 </p>
               </div>
+
+              <div role="radiogroup" aria-label="Logo pool" className="grid grid-cols-3 gap-2">
+                {MODES.map((m) => (
+                  <button
+                    key={m.id}
+                    type="button"
+                    role="radio"
+                    aria-checked={mode === m.id}
+                    onClick={() => setMode(m.id)}
+                    className={`cursor-pointer rounded-lg border px-2 py-2.5 text-left transition ${
+                      mode === m.id
+                        ? "border-emerald-500/60 bg-emerald-950/40"
+                        : "border-zinc-800 hover:border-zinc-600"
+                    }`}
+                  >
+                    <span
+                      className={`block font-mono text-[11px] font-semibold ${
+                        mode === m.id ? "text-emerald-300" : "text-zinc-200"
+                      }`}
+                    >
+                      {m.label}
+                    </span>
+                    <span className="mt-0.5 block text-[10px] leading-tight text-zinc-500">
+                      {m.description}
+                    </span>
+                    <span className="mt-1 block font-mono text-[10px] text-zinc-600">
+                      {poolSizes[m.id]} logos
+                    </span>
+                  </button>
+                ))}
+              </div>
+
+              <div className="overflow-hidden rounded-lg border border-zinc-800 font-mono text-[11px]">
+                {LEVELS.map((level) => (
+                  <div
+                    key={level.id}
+                    className="flex items-center justify-between border-b border-zinc-800/80 px-3 py-2 last:border-b-0"
+                  >
+                    <span className="flex items-center gap-2">
+                      <span
+                        className={`rounded border px-1.5 py-0.5 text-[9px] font-semibold uppercase ${level.badge}`}
+                      >
+                        {level.name}
+                      </span>
+                      <span className="text-zinc-500">Q{level.fromQuestion}+</span>
+                    </span>
+                    <span className="text-zinc-400">
+                      {level.seconds}s · {level.artLabel} · x{level.multiplier}
+                    </span>
+                  </div>
+                ))}
+              </div>
+
               <button
                 type="button"
                 onClick={startGame}
-                className="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-zinc-100 hover:bg-white text-zinc-950 font-semibold text-xs font-mono transition cursor-pointer"
+                className="inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg bg-zinc-100 px-4 py-2.5 font-mono text-xs font-semibold text-zinc-950 transition hover:bg-white"
               >
-                <FiPlay className="w-3.5 h-3.5" />
-                <span>Start sprint</span>
+                <FiPlay className="h-3.5 w-3.5" />
+                <span>Start · press Enter</span>
               </button>
+              {bestScore > 0 && (
+                <p className="text-center font-mono text-[11px] text-zinc-500">
+                  Your best: <span className="text-emerald-300">{bestScore} pts</span>
+                </p>
+              )}
             </div>
           )}
         </div>
       </div>
 
-      {/* Right Column: Score Submission + Leaderboard */}
-      <aside className="lg:col-span-5 xl:col-span-4 space-y-4">
-        <div className="border border-zinc-800 rounded-xl bg-[#111114] p-4 space-y-3">
+      {/* Right column: score submission + leaderboard */}
+      <aside className="space-y-4 lg:col-span-5 xl:col-span-4">
+        <div className="space-y-3 rounded-xl border border-zinc-800 bg-[#111114] p-4">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-mono font-medium text-zinc-200">
-              Submit Score
-            </span>
-            <span className="text-xs font-mono text-emerald-400 tabular-nums">
+            <span className="font-mono text-xs font-medium text-zinc-200">Submit Score</span>
+            <span className="font-mono text-xs tabular-nums text-emerald-400">
               Current: {score} pts
             </span>
           </div>
@@ -753,7 +1103,8 @@ export default function StackGuesserGame({
                 value={playerName}
                 onChange={(e) => setPlayerName(e.target.value)}
                 placeholder="Enter your name"
-                className="flex-1 min-w-0 bg-zinc-950 border border-zinc-800 focus:border-emerald-500 rounded-lg px-3 py-2 text-xs text-white placeholder:text-zinc-500 focus:outline-none transition"
+                aria-label="Your name"
+                className="min-w-0 flex-1 rounded-lg border border-zinc-800 bg-zinc-950 px-3 py-2 text-xs text-white transition placeholder:text-zinc-500 focus:border-emerald-500 focus:outline-none"
               />
               <button
                 type="submit"
@@ -763,15 +1114,15 @@ export default function StackGuesserGame({
                   score <= 0 ||
                   submittedScore === score
                 }
-                className="px-3.5 py-2 rounded-lg bg-emerald-500 hover:bg-emerald-400 disabled:bg-zinc-800 disabled:text-zinc-500 text-zinc-950 font-semibold text-xs font-mono transition shrink-0 cursor-pointer disabled:cursor-not-allowed"
+                className="shrink-0 cursor-pointer rounded-lg bg-emerald-500 px-3.5 py-2 font-mono text-xs font-semibold text-zinc-950 transition hover:bg-emerald-400 disabled:cursor-not-allowed disabled:bg-zinc-800 disabled:text-zinc-500"
               >
                 {submittingScore ? "Saving..." : "Save"}
               </button>
             </div>
 
             {submittedScore === score && score > 0 && (
-              <p className="text-[11px] font-mono text-emerald-400 inline-flex items-center gap-1.5">
-                <FiCheck className="w-3.5 h-3.5" />
+              <p className="inline-flex items-center gap-1.5 font-mono text-[11px] text-emerald-400">
+                <FiCheck className="h-3.5 w-3.5" />
                 <span>
                   Saved {score} pts for {playerName.trim()}
                 </span>
@@ -779,14 +1130,14 @@ export default function StackGuesserGame({
             )}
 
             {submitError && (
-              <p className="text-[11px] font-mono text-rose-400">
+              <p role="alert" className="font-mono text-[11px] text-rose-400">
                 {submitError}
               </p>
             )}
 
             {gameState !== "gameover" && submittedScore !== score && (
-              <p className="text-[11px] font-mono text-zinc-500">
-                Finish the 15-stack round to save your score.
+              <p className="font-mono text-[11px] text-zinc-500">
+                Finish a round to save your score.
               </p>
             )}
           </form>

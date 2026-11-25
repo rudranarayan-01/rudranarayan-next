@@ -425,7 +425,7 @@ export default function PaymentsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#09090b] text-zinc-100 px-4 py-6 sm:px-6 lg:px-10 font-sans">
+    <div className="min-h-screen text-zinc-100 px-4 py-6 sm:px-6 lg:px-10 font-sans">
       <Toaster position="top-right" theme="dark" richColors />
 
       <div className="max-w-7xl mx-auto space-y-6">
