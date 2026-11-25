@@ -5,6 +5,7 @@ import React from "react";
 import PublicDecorators from "./components/PublicDecorators";
 import { cn } from "@/lib/utils";
 import { Toaster } from "@/components/ui/sonner";
+import GameScrollbar from "./components/games/GameScrollbar";
 
 const geist = Geist({ subsets: ["latin"], variable: "--font-sans" });
 
@@ -64,6 +65,7 @@ export default function RootLayout({
     <html lang="en" className={cn("font-sans", geist.variable)}>
       <body className={`${outfit.variable} antialiased`}>
         <PublicDecorators />
+        <GameScrollbar />
         <Toaster position="top-right" richColors />
         {children}
       </body>
