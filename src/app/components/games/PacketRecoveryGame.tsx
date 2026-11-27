@@ -3,6 +3,7 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { FiCheck, FiPlay, FiRotateCcw } from "react-icons/fi";
 import Leaderboard from "./Leaderboard";
+import { startGameSession } from "@/lib/gameSessionClient";
 
 interface FallingItem {
   id: number;
@@ -27,7 +28,7 @@ export default function PacketRecoveryGame({
   compact = false,
 }: PacketRecoveryGameProps) {
   const [gameState, setGameState] = useState<"idle" | "playing" | "gameover">(
-    "idle"
+    "idle",
   );
   const [score, setScore] = useState(0);
   const [bestScore, setBestScore] = useState(0);
@@ -54,6 +55,7 @@ export default function PacketRecoveryGame({
   const lastSpawnRef = useRef(0);
   const scoreRef = useRef(0);
   const feedbackTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const sessionTokenRef = useRef<string | null>(null);
 
   const triggerFeedback = useCallback((type: "catch" | "hit") => {
     setFeedback(type);
@@ -91,7 +93,7 @@ export default function PacketRecoveryGame({
     setPaddleX(clamped);
   }, []);
 
-  const startGame = () => {
+  const startGame = async () => {
     scoreRef.current = 0;
     setScore(0);
     setLives(3);
@@ -102,6 +104,7 @@ export default function PacketRecoveryGame({
     updatePaddle(50);
     lastSpawnRef.current = performance.now();
     setGameState("playing");
+    sessionTokenRef.current = await startGameSession(gameId);
   };
 
   useEffect(() => {
@@ -270,6 +273,7 @@ export default function PacketRecoveryGame({
           gameId,
           playerName: trimmed,
           score,
+          sessionToken: sessionTokenRef.current,
         }),
       });
 
@@ -277,6 +281,8 @@ export default function PacketRecoveryGame({
       if (!res.ok || !json.success) {
         throw new Error(json.error || "Could not save score.");
       }
+
+      sessionTokenRef.current = null;
 
       try {
         localStorage.setItem(NAME_STORAGE_KEY, trimmed);
@@ -496,7 +502,9 @@ export default function PacketRecoveryGame({
             {submittedScore === score && score > 0 && (
               <p className="text-[11px] font-mono text-emerald-400 inline-flex items-center gap-1.5">
                 <FiCheck className="w-3.5 h-3.5" />
-                <span>Saved {score} pts for {playerName.trim()}</span>
+                <span>
+                  Saved {score} pts for {playerName.trim()}
+                </span>
               </p>
             )}
 

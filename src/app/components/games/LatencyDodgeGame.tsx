@@ -3,6 +3,7 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { FiCheck, FiPlay, FiRotateCcw } from "react-icons/fi";
 import Leaderboard from "./Leaderboard";
+import { startGameSession } from "@/lib/gameSessionClient";
 
 interface TrafficCarObstacle {
   id: number;
@@ -159,6 +160,7 @@ export default function LatencyDodgeGame({
   const scoreAccumulatorRef = useRef(0);
   const scoreRef = useRef(0);
   const flashTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const sessionTokenRef = useRef<string | null>(null);
 
   const triggerHitFlash = useCallback(() => {
     setHitFlash(true);
@@ -189,7 +191,7 @@ export default function LatencyDodgeGame({
     setPlayerX(clamped);
   }, []);
 
-  const startGame = () => {
+  const startGame = async () => {
     scoreRef.current = 0;
     scoreAccumulatorRef.current = 0;
     roadOffsetRef.current = 0;
@@ -203,6 +205,7 @@ export default function LatencyDodgeGame({
     updatePlayerX(50);
     lastSpawnRef.current = performance.now();
     setGameState("playing");
+    sessionTokenRef.current = await startGameSession(gameId);
   };
 
   useEffect(() => {
@@ -378,7 +381,7 @@ export default function LatencyDodgeGame({
       const res = await fetch("/api/leaderboard", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ gameId, playerName: trimmed, score }),
+        body: JSON.stringify({ gameId, playerName: trimmed, score, sessionToken: sessionTokenRef.current, }),
       });
 
       const json = await res.json();

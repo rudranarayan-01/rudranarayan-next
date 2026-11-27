@@ -3,6 +3,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { FiCheck, FiPlay, FiRotateCcw } from "react-icons/fi";
 import Leaderboard from "./Leaderboard";
+import { startGameSession } from "@/lib/gameSessionClient";
 
 interface GridSweepGameProps {
   gameId?: string;
@@ -129,6 +130,7 @@ export default function GridSweepGame({
 
   const nameInputRef = useRef<HTMLInputElement | null>(null);
   const totalSafeCells = SIZE * SIZE - FAULT_COUNT;
+  const sessionTokenRef = useRef<string | null>(null);
 
   useEffect(() => {
     try {
@@ -141,7 +143,7 @@ export default function GridSweepGame({
     }
   }, [gameId]);
 
-  const startGame = () => {
+  const startGame = async () => {
     setBoard(createBoard(-1, -1));
     setInitialized(false);
     setClearedSafe(0);
@@ -149,6 +151,7 @@ export default function GridSweepGame({
     setSubmittedScore(null);
     setSubmitError(null);
     setGameState("playing");
+    sessionTokenRef.current = await startGameSession(gameId);
   };
 
   const updateScore = (nextPoints: number) => {
@@ -235,7 +238,7 @@ export default function GridSweepGame({
       const res = await fetch("/api/leaderboard", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ gameId, playerName: trimmed, score }),
+        body: JSON.stringify({ gameId, playerName: trimmed, score, sessionToken: sessionTokenRef.current, }),
       });
 
       const json = await res.json();

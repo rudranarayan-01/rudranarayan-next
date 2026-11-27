@@ -3,6 +3,7 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { FiCheck, FiPlay, FiRotateCcw } from "react-icons/fi";
 import Leaderboard from "./Leaderboard";
+import { startGameSession } from "@/lib/gameSessionClient";
 
 interface MathChallenge {
   prompt: string;
@@ -78,6 +79,7 @@ export default function IndexSprintGame({
   const nameInputRef = useRef<HTMLInputElement | null>(null);
   const streakRef = useRef(0);
   const scoreRef = useRef(0);
+  const sessionTokenRef = useRef<string | null>(null);
 
   useEffect(() => {
     try {
@@ -90,7 +92,7 @@ export default function IndexSprintGame({
     }
   }, [gameId]);
 
-  const startGame = () => {
+  const startGame = async () => {
     streakRef.current = 0;
     scoreRef.current = 0;
     setStreak(0);
@@ -101,6 +103,7 @@ export default function IndexSprintGame({
     setSubmitError(null);
     setChallenge(generateChallenge(0));
     setGameState("playing");
+    sessionTokenRef.current = await startGameSession(gameId);
   };
 
   useEffect(() => {
@@ -195,7 +198,7 @@ export default function IndexSprintGame({
       const res = await fetch("/api/leaderboard", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ gameId, playerName: trimmed, score }),
+        body: JSON.stringify({ gameId, playerName: trimmed, score, sessionToken: sessionTokenRef.current, }),
       });
 
       const json = await res.json();

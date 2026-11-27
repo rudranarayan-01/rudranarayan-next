@@ -1,6 +1,27 @@
 import { NextRequest, NextResponse } from "next/server";
 import connectDB from "@/lib/db";
 import { LeaderboardScore } from "@/models/LeaderboardScore";
+import { PORTFOLIO_GAMES } from "@/data/games";
+import { verifyGameSessionToken } from "@/lib/gameSessionToken";
+
+const MAX_SCORE_BY_GAME: Record<string, number> = {
+  "packet-recovery": 5000,
+  "latency-dodge": 10000,
+  "index-sprint": 5000,
+  "sequence-memory": 5000,
+  "grid-sweep": 5000,
+  "flag-cipher": 5000,
+  "stack-guesser": 5000,
+  "chess-tactics": 2000,
+};
+
+const RATE_WINDOW_MS = 60_000;
+const MAX_SUBMISSIONS_PER_WINDOW = 8;
+const rateLimitStore = new Map<string, number[]>();
+
+// Tracks recently used token nonces in memory (expires after 30m)
+const usedNonces = new Map<string, number>();
+const NONCE_TTL_MS = 30 * 60 * 1000;
 
 function normalizeIp(raw?: string | null): string | null {
   if (!raw) return null;
@@ -27,6 +48,70 @@ function getClientIp(req: NextRequest): string | null {
 
 function escapeRegex(input: string): string {
   return input.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+function isRateLimited(ipKey: string): boolean {
+  const now = Date.now();
+  const recent = (rateLimitStore.get(ipKey) || []).filter(
+    (ts) => now - ts < RATE_WINDOW_MS
+  );
+  if (recent.length >= MAX_SUBMISSIONS_PER_WINDOW) {
+    rateLimitStore.set(ipKey, recent);
+    return true;
+  }
+  recent.push(now);
+  rateLimitStore.set(ipKey, recent);
+  return false;
+}
+
+function isAllowedOrigin(req: NextRequest): boolean {
+  const origin = req.headers.get("origin");
+  const referer = req.headers.get("referer");
+  const host = req.headers.get("host");
+
+  if (!origin && !referer) return false;
+
+  const allowedHosts = new Set<string>();
+  if (host) allowedHosts.add(host.toLowerCase());
+
+  if (process.env.NEXT_PUBLIC_SITE_URL) { 
+    try {
+      allowedHosts.add(
+        new URL(process.env.NEXT_PUBLIC_SITE_URL).host.toLowerCase()
+      );
+    } catch {
+      // Ignore malformed env URL
+    }
+  }
+
+  try {
+    if (origin && allowedHosts.has(new URL(origin).host.toLowerCase())) {
+      return true;
+    }
+    if (referer && allowedHosts.has(new URL(referer).host.toLowerCase())) {
+      return true;
+    }
+  } catch {
+    return false;
+  }
+
+  return false;
+}
+
+function consumeNonce(nonce?: string): boolean {
+  if (!nonce) return true;
+  const now = Date.now();
+
+  for (const [key, expiresAt] of usedNonces.entries()) {
+    if (expiresAt <= now) usedNonces.delete(key);
+  }
+
+  if (usedNonces.has(nonce)) {
+    return false;
+  }
+
+  usedNonces.set(nonce, now + NONCE_TTL_MS);
+  return true;
 }
 
 export async function GET(req: NextRequest) {
@@ -60,7 +145,25 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   try {
-    await connectDB();
+    const clientIp = getClientIp(req);
+    const rateKey = clientIp || "unknown";
+
+    if (isRateLimited(rateKey)) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: "Too many submissions. Please try again in a minute.",
+        },
+        { status: 429 }
+      );
+    }
+
+    if (!isAllowedOrigin(req)) {
+      return NextResponse.json(
+        { success: false, error: "Forbidden request origin." },
+        { status: 403 }
+      );
+    }
 
     const body = await req.json().catch(() => null);
     if (!body || typeof body !== "object") {
@@ -70,15 +173,19 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const gameId = String(body.gameId || "packet-recovery")
+    const gameId = String(body.gameId || "")
       .trim()
       .slice(0, 64);
     const rawName = String(body.playerName || "").trim();
     const numericScore = Number(body.score);
+    const sessionToken = body.sessionToken;
 
-    if (!gameId) {
+    const validGame = PORTFOLIO_GAMES.find(
+      (g) => g.id === gameId && g.status === "playable"
+    );
+    if (!validGame) {
       return NextResponse.json(
-        { success: false, error: "gameId is required." },
+        { success: false, error: "Invalid or unplayable gameId." },
         { status: 400 }
       );
     }
@@ -93,16 +200,57 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    if (!Number.isFinite(numericScore) || numericScore <= 0) {
+    const maxScore = MAX_SCORE_BY_GAME[gameId] ?? 10000;
+    if (
+      !Number.isFinite(numericScore) ||
+      numericScore <= 0 ||
+      Math.floor(numericScore) > maxScore
+    ) {
       return NextResponse.json(
-        { success: false, error: "Score must be greater than 0." },
+        {
+          success: false,
+          error: `Score must be between 1 and ${maxScore}.`,
+        },
         { status: 400 }
       );
     }
 
+    const tokenCheck = verifyGameSessionToken(sessionToken, gameId);
+    if (!tokenCheck.valid) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: tokenCheck.reason || "Invalid or expired game session.",
+        },
+        { status: 403 }
+      );
+    }
+
+    // Extract nonce to prevent replaying the exact same session token
+    let tokenNonce: string | undefined;
+    try {
+      const payloadPart = String(sessionToken).split(".")[0];
+      const decoded = JSON.parse(
+        Buffer.from(payloadPart, "base64url").toString("utf8")
+      );
+      if (typeof decoded?.nonce === "string") {
+        tokenNonce = decoded.nonce;
+      }
+    } catch {
+      // Already verified by verifyGameSessionToken
+    }
+
+    if (!consumeNonce(tokenNonce)) {
+      return NextResponse.json(
+        { success: false, error: "Session token has already been used." },
+        { status: 403 }
+      );
+    }
+
+    await connectDB();
+
     const cleanName = rawName.replace(/\s+/g, " ");
     const nextScore = Math.floor(numericScore);
-    const clientIp = getClientIp(req);
     const nameRegex = new RegExp(`^${escapeRegex(cleanName)}$`, "i");
     const now = new Date();
 

@@ -3,6 +3,7 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { FiCheck, FiPlay, FiRotateCcw } from "react-icons/fi";
 import Leaderboard from "./Leaderboard";
+import { startGameSession } from "@/lib/gameSessionClient";
 
 interface SequenceMemoryGameProps {
   gameId?: string;
@@ -35,6 +36,7 @@ export default function SequenceMemoryGame({
 
   const nameInputRef = useRef<HTMLInputElement | null>(null);
   const timersRef = useRef<ReturnType<typeof setTimeout>[]>([]);
+  const sessionTokenRef = useRef<string | null>(null);
 
   const clearAllTimers = useCallback(() => {
     timersRef.current.forEach((t) => clearTimeout(t));
@@ -84,7 +86,7 @@ export default function SequenceMemoryGame({
     [clearAllTimers]
   );
 
-  const startNewRun = () => {
+  const startNewRun = async () => {
     clearAllTimers();
     const first = Math.floor(Math.random() * GRID_SIZE);
     const initialSeq = [first];
@@ -95,6 +97,7 @@ export default function SequenceMemoryGame({
     setSubmittedScore(null);
     setSubmitError(null);
     playSequence(initialSeq);
+    sessionTokenRef.current = await startGameSession(gameId);
   };
 
   const handleCellClick = (index: number) => {
@@ -164,7 +167,7 @@ export default function SequenceMemoryGame({
       const res = await fetch("/api/leaderboard", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ gameId, playerName: trimmed, score }),
+        body: JSON.stringify({ gameId, playerName: trimmed, score, sessionToken: sessionTokenRef.current, }),
       });
 
       const json = await res.json();

@@ -1,10 +1,24 @@
 /* eslint-disable no-undef */
 "use client";
 
-import React, { useCallback, useEffect, useId, useMemo, useRef, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useId,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { Chess, PieceSymbol, Square } from "chess.js";
-import { FiCheck, FiPlay, FiRotateCcw, FiVolume2, FiVolumeX } from "react-icons/fi";
+import {
+  FiCheck,
+  FiPlay,
+  FiRotateCcw,
+  FiVolume2,
+  FiVolumeX,
+} from "react-icons/fi";
 import Leaderboard from "./Leaderboard";
+import { startGameSession } from "@/lib/gameSessionClient";
 
 interface ChessGameProps {
   gameId?: string;
@@ -57,14 +71,17 @@ function createChessSoundPlayer() {
     startOffset: number,
     duration: number,
     gainPeak: number,
-    type: OscillatorType = "triangle"
+    type: OscillatorType = "triangle",
   ) => {
     const now = audioCtx.currentTime + startOffset;
     const osc = audioCtx.createOscillator();
     const gain = audioCtx.createGain();
     osc.type = type;
     osc.frequency.setValueAtTime(freq, now);
-    osc.frequency.exponentialRampToValueAtTime(Math.max(70, freq * 0.65), now + duration);
+    osc.frequency.exponentialRampToValueAtTime(
+      Math.max(70, freq * 0.65),
+      now + duration,
+    );
 
     gain.gain.setValueAtTime(0.0001, now);
     gain.gain.linearRampToValueAtTime(gainPeak, now + 0.008);
@@ -330,15 +347,16 @@ export default function ChessGame({
   const nameInputRef = useRef<HTMLInputElement | null>(null);
   const botTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const playSoundRef = useRef(createChessSoundPlayer());
+  const sessionTokenRef = useRef<string | null>(null);
 
   const [gameState, setGameState] = useState<"idle" | "playing" | "gameover">(
-    "idle"
+    "idle",
   );
   const [board, setBoard] = useState(() => chessRef.current.board());
   const [selectedSquare, setSelectedSquare] = useState<Square | null>(null);
   const [legalTargets, setLegalTargets] = useState<Square[]>([]);
   const [lastMove, setLastMove] = useState<{ from: Square; to: Square } | null>(
-    null
+    null,
   );
   const [moveHistory, setMoveHistory] = useState<string[]>([]);
   const [capturedByWhite, setCapturedByWhite] = useState<
@@ -348,7 +366,7 @@ export default function ChessGame({
     { color: "w" | "b"; type: PieceSymbol }[]
   >([]);
   const [checkedKingSquare, setCheckedKingSquare] = useState<Square | null>(
-    null
+    null,
   );
   const [statusText, setStatusText] = useState("White to move");
   const [score, setScore] = useState(0);
@@ -408,7 +426,7 @@ export default function ChessGame({
       }
       return null;
     },
-    []
+    [],
   );
 
   const updateBest = useCallback(
@@ -423,7 +441,7 @@ export default function ChessGame({
         return updated;
       });
     },
-    [gameId]
+    [gameId],
   );
 
   const syncAfterMove = useCallback(
@@ -434,7 +452,9 @@ export default function ChessGame({
       setLegalTargets([]);
 
       const inCheck = chess.inCheck();
-      setCheckedKingSquare(inCheck ? findKingSquare(chess, chess.turn()) : null);
+      setCheckedKingSquare(
+        inCheck ? findKingSquare(chess, chess.turn()) : null,
+      );
 
       setScore((prev) => {
         let nextScore = Math.max(0, prev + deltaScore);
@@ -451,7 +471,7 @@ export default function ChessGame({
           setStatusText(
             chess.turn() === "b"
               ? "Checkmate · White wins"
-              : "Checkmate · Black wins"
+              : "Checkmate · Black wins",
           );
         } else if (chess.isDraw()) {
           setStatusText("Draw");
@@ -474,7 +494,7 @@ export default function ChessGame({
         chess.turn() === "w" ? "White to move" : "Black bot thinking...";
       setStatusText(inCheck ? `${turnLabel} · Check` : turnLabel);
     },
-    [findKingSquare, soundEnabled, updateBest]
+    [findKingSquare, soundEnabled, updateBest],
   );
 
   const runBotMove = useCallback(() => {
@@ -528,7 +548,8 @@ export default function ChessGame({
     }
   }, [board, gameState, runBotMove]);
 
-  const startGame = () => {
+  const startGame = async () => {
+    sessionTokenRef.current = null;
     if (botTimeoutRef.current) clearTimeout(botTimeoutRef.current);
     const fresh = new Chess();
     chessRef.current = fresh;
@@ -545,6 +566,7 @@ export default function ChessGame({
     setSubmitError(null);
     setStatusText("White to move");
     setGameState("playing");
+    sessionTokenRef.current = await startGameSession(gameId);
   };
 
   const handleSquareClick = (square: Square) => {
@@ -608,14 +630,19 @@ export default function ChessGame({
       const res = await fetch("/api/leaderboard", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ gameId, playerName: trimmed, score }),
+        body: JSON.stringify({
+          gameId,
+          playerName: trimmed,
+          score,
+          sessionToken: sessionTokenRef.current,
+        }),
       });
 
       const json = await res.json();
       if (!res.ok || !json.success) {
         throw new Error(json.error || "Could not save score.");
       }
-
+      sessionTokenRef.current = null;
       try {
         localStorage.setItem(NAME_STORAGE_KEY, trimmed);
       } catch {
@@ -634,11 +661,11 @@ export default function ChessGame({
   const materialAdvantage = useMemo(() => {
     const whiteMat = capturedByWhite.reduce(
       (sum, p) => sum + (PIECE_MATERIAL_VALUES[p.type] || 0),
-      0
+      0,
     );
     const blackMat = capturedByBlack.reduce(
       (sum, p) => sum + (PIECE_MATERIAL_VALUES[p.type] || 0),
-      0
+      0,
     );
     return whiteMat - blackMat;
   }, [capturedByBlack, capturedByWhite]);
@@ -773,12 +800,15 @@ export default function ChessGame({
                           isSelected ? "-translate-y-0.5 scale-105" : ""
                         }`}
                       >
-                        <StauntonPieceSvg color={piece.color} type={piece.type} />
+                        <StauntonPieceSvg
+                          color={piece.color}
+                          type={piece.type}
+                        />
                       </span>
                     )}
                   </button>
                 );
-              })
+              }),
             )}
           </div>
 

@@ -4,6 +4,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { FiCheck, FiHeart, FiPlay, FiRotateCcw, FiX } from "react-icons/fi";
 import Leaderboard from "./Leaderboard";
+import { startGameSession } from "@/lib/gameSessionClient";
 
 /* ───────────────────────────── Types ───────────────────────────── */
 
@@ -483,6 +484,7 @@ export default function StackGuesserGame({
   const streakRef = useRef(0);
   const bestStreakRef = useRef(0);
   const livesRef = useRef(STARTING_LIVES);
+  const sessionTokenRef = useRef<string | null>(null);
 
   const currentQuestion: LogoQuestion | undefined = questions[currentIdx];
   const currentLevel = currentQuestion?.level ?? LEVELS[0];
@@ -532,7 +534,7 @@ export default function StackGuesserGame({
     setGameState("gameover");
   };
 
-  const startGame = () => {
+  const startGame = async () => {
     clearAdvanceTimer();
     setQuestions(buildDeck(mode));
     setCurrentIdx(0);
@@ -551,6 +553,7 @@ export default function StackGuesserGame({
     livesRef.current = STARTING_LIVES;
     lockedRef.current = false;
     setGameState("playing");
+    sessionTokenRef.current = await startGameSession(gameId);
   };
 
   const resolveAnswer = (chosen: TechItem | null) => {
@@ -694,7 +697,7 @@ export default function StackGuesserGame({
       const res = await fetch("/api/leaderboard", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ gameId, playerName: trimmed, score }),
+        body: JSON.stringify({ gameId, playerName: trimmed, score, sessionToken: sessionTokenRef.current, }),
       });
 
       const json = await res.json();

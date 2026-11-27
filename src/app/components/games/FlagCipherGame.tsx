@@ -3,6 +3,7 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { FiCheck, FiPlay, FiRotateCcw, FiX } from "react-icons/fi";
 import Leaderboard from "./Leaderboard";
+import { startGameSession } from "@/lib/gameSessionClient";
 
 interface FlagCipherGameProps {
   gameId?: string;
@@ -351,6 +352,7 @@ export default function FlagCipherGame({
   const advanceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const scoreRef = useRef(0);
   const streakRef = useRef(0);
+  const sessionTokenRef = useRef<string | null>(null);
 
   const clearAdvanceTimer = useCallback(() => {
     if (advanceTimerRef.current) {
@@ -389,7 +391,7 @@ export default function FlagCipherGame({
     });
   }, [clearAdvanceTimer, gameId]);
 
-  const startGame = () => {
+  const startGame = async () => {
     clearAdvanceTimer();
     const deck = generateFifteenQuestions();
     setQuestions(deck);
@@ -404,6 +406,7 @@ export default function FlagCipherGame({
     setSubmittedScore(null);
     setSubmitError(null);
     setGameState("playing");
+    sessionTokenRef.current = await startGameSession(gameId);
   };
 
   useEffect(() => {
@@ -507,7 +510,7 @@ export default function FlagCipherGame({
       const res = await fetch("/api/leaderboard", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ gameId, playerName: trimmed, score }),
+        body: JSON.stringify({ gameId, playerName: trimmed, score, sessionToken: sessionTokenRef.current, }),
       });
 
       const json = await res.json();
