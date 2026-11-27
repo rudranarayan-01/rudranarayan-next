@@ -100,7 +100,7 @@ export default function ProjectDetailsPage() {
       
       {/* Top Header & Telemetry Status Bar */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-zinc-800/80 pb-6 animate-slide-left">
-        <Link href="/" className="text-xs font-mono text-zinc-400 hover:text-emerald-400 transition-colors flex items-center gap-2 group w-fit">
+        <Link href="/" className="text-xs font-mono cursor-pointer text-zinc-400 hover:text-emerald-400 transition-colors flex items-center gap-2 group w-fit">
           <span className="group-hover:-translate-x-1 transition-transform">←</span> Fleet Overview
         </Link>
         <div className="flex items-center gap-3">

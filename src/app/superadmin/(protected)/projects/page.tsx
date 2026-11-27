@@ -1,6 +1,7 @@
 /* eslint-disable no-undef */
 "use client";
 
+import ProjectFormModal from "@/app/components/ProjectFormModal";
 import React, { useEffect, useState } from "react";
 import { toast } from "sonner";
 
@@ -365,172 +366,14 @@ export default function AdminProjectsPage() {
         </div>
       )}
 
-      {/* Modal Form */}
-      {isModalOpen && (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-zinc-950 border border-zinc-800 rounded-2xl w-full max-w-xl p-6 space-y-4 shadow-2xl max-h-[90vh] overflow-y-auto">
-            <h3 className="text-xs font-mono font-bold text-white uppercase tracking-wider">
-              {editingSlug !== null
-                ? "Edit Deployment Record"
-                : "Add New Deployment Record"}
-            </h3>
-            <form
-              onSubmit={handleSubmit}
-              className="space-y-3 text-xs font-mono"
-            >
-              <div className="grid grid-cols-2 gap-2">
-                <input
-                  type="text"
-                  placeholder="Project Name"
-                  required
-                  value={form.name}
-                  onChange={(e) => setForm({ ...form, name: e.target.value })}
-                  className="w-full px-3 py-2 bg-zinc-900 border border-zinc-800 rounded-xl text-white focus:outline-none focus:border-emerald-500/50"
-                />
-                <input
-                  type="text"
-                  placeholder="Slug (optional)"
-                  value={form.slug}
-                  onChange={(e) => setForm({ ...form, slug: e.target.value })}
-                  className="w-full px-3 py-2 bg-zinc-900 border border-zinc-800 rounded-xl text-white focus:outline-none focus:border-emerald-500/50"
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-2">
-                <input
-                  type="text"
-                  placeholder="Client Name (e.g. Shiv Kukreja)"
-                  value={form.clientName}
-                  onChange={(e) =>
-                    setForm({ ...form, clientName: e.target.value })
-                  }
-                  className="w-full px-3 py-2 bg-zinc-900 border border-zinc-800 rounded-xl text-white focus:outline-none"
-                />
-                <input
-                  type="text"
-                  placeholder="Client Company (e.g. HouseXpertz Delhi)"
-                  value={form.clientCompany}
-                  onChange={(e) =>
-                    setForm({ ...form, clientCompany: e.target.value })
-                  }
-                  className="w-full px-3 py-2 bg-zinc-900 border border-zinc-800 rounded-xl text-white focus:outline-none"
-                />
-              </div>
-
-              <textarea
-                rows={2}
-                placeholder="Short Description"
-                value={form.description}
-                onChange={(e) =>
-                  setForm({ ...form, description: e.target.value })
-                }
-                className="w-full px-3 py-2 bg-zinc-900 border border-zinc-800 rounded-xl text-white focus:outline-none resize-none font-sans"
-              />
-
-              <textarea
-                rows={3}
-                placeholder="Detailed Implementation Overview (long description)"
-                value={form.longDescription}
-                onChange={(e) =>
-                  setForm({ ...form, longDescription: e.target.value })
-                }
-                className="w-full px-3 py-2 bg-zinc-900 border border-zinc-800 rounded-xl text-white focus:outline-none resize-none font-sans"
-              />
-
-              <div className="grid grid-cols-2 gap-2">
-                <select
-                  value={form.status}
-                  onChange={(e) => setForm({ ...form, status: e.target.value })}
-                  className="w-full px-3 py-2 bg-zinc-900 border border-zinc-800 rounded-xl text-white focus:outline-none"
-                >
-                  <option value="Published">Published</option>
-                  <option value="In Development">In Development</option>
-                  <option value="Archived">Archived</option>
-                </select>
-
-                <input
-                  type="text"
-                  placeholder="Thumbnail Image URL"
-                  value={form.thumbnailUrl}
-                  onChange={(e) =>
-                    setForm({ ...form, thumbnailUrl: e.target.value })
-                  }
-                  className="w-full px-3 py-2 bg-zinc-900 border border-zinc-800 rounded-xl text-white focus:outline-none"
-                />
-              </div>
-
-              {/* Gallery Images Field */}
-              <div className="space-y-1">
-                <label className="text-[10px] font-mono text-blue-400 uppercase tracking-widest block">
-                  Gallery Images (One URL per line or comma-separated)
-                </label>
-                <textarea
-                  rows={3}
-                  placeholder="https://images.unsplash.com/photo-...\nhttps://images.unsplash.com/photo-..."
-                  value={form.galleryImagesText}
-                  onChange={(e) =>
-                    setForm({ ...form, galleryImagesText: e.target.value })
-                  }
-                  className="w-full px-3 py-2 bg-zinc-900 border border-zinc-800 rounded-xl text-white focus:outline-none resize-none font-mono text-[11px]"
-                />
-              </div>
-
-              <textarea
-                rows={2}
-                placeholder="Action Links (Format -> Label: https://url.com, one per line)"
-                value={form.linksText}
-                onChange={(e) =>
-                  setForm({ ...form, linksText: e.target.value })
-                }
-                className="w-full px-3 py-2 bg-zinc-900 border border-zinc-800 rounded-xl text-white focus:outline-none resize-none font-mono text-[11px]"
-              />
-
-              <input
-                type="text"
-                placeholder="Tech Stack (Comma-separated, e.g. React, Next.js, Node.js)"
-                value={form.techStackText}
-                onChange={(e) =>
-                  setForm({ ...form, techStackText: e.target.value })
-                }
-                className="w-full px-3 py-2 bg-zinc-900 border border-zinc-800 rounded-xl text-white focus:outline-none"
-              />
-
-              {/* Architecture Pipeline Field */}
-              <div className="space-y-1">
-                <label className="text-[10px] font-mono text-amber-400 uppercase tracking-widest block">
-                  Architecture Pipeline (Format: Title | Description | Tech1,
-                  Tech2)
-                </label>
-                <textarea
-                  rows={4}
-                  placeholder="Phase Title | Step breakdown description | Next.js, TypeScript"
-                  value={form.architectureText}
-                  onChange={(e) =>
-                    setForm({ ...form, architectureText: e.target.value })
-                  }
-                  className="w-full px-3 py-2 bg-zinc-900 border border-zinc-800 rounded-xl text-white focus:outline-none resize-none font-mono text-[11px]"
-                />
-              </div>
-
-              <div className="flex justify-end gap-2 pt-3 border-t border-zinc-900">
-                <button
-                  type="button"
-                  onClick={() => setIsModalOpen(false)}
-                  className="px-4 py-2 bg-zinc-900 border border-zinc-800 text-zinc-400 rounded-xl hover:text-white"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="px-4 py-2 bg-white text-black font-semibold rounded-xl hover:bg-zinc-200"
-                >
-                  Save Deployment
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
+      <ProjectFormModal
+        isOpen={isModalOpen}
+        editingSlug={editingSlug}
+        form={form}
+        setForm={setForm}
+        onClose={() => setIsModalOpen(false)}
+        onSubmit={handleSubmit}
+      />
     </div>
   );
 }

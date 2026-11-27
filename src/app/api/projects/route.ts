@@ -12,7 +12,6 @@ export async function GET() {
   try {
     await connectDB();
     const projects = await Project.find()
-      .select("name slug status description  clientInfo longDescription techStack thumbnailUrl links updatedAt")
       .sort({ updatedAt: -1 });
     return NextResponse.json(
       { success: true, data: projects },

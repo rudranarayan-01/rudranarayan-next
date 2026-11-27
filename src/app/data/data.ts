@@ -29,7 +29,7 @@ import {
   SiFramer,
   SiVercel,
 } from "react-icons/si";
-import { LuSquareCode } from "react-icons/lu";
+import { LuGamepad2, LuSquareCode } from "react-icons/lu";
 import { SiScikitlearn, SiPytorch, SiOpencv, SiTensorflow, SiPandas, SiFlask, SiDjango, SiExpo } from "react-icons/si";
 
 import React from 'react';
@@ -74,14 +74,15 @@ type NavbarItem = {
 export const navbarData: NavbarItem[] = [
   { name: "Home", type: "scroll", icon: FiHome, size: "18px" },
   { name: "About", type: "scroll", icon: TbUserSquare, size: "18px" },
-  { name: "Projects", type: "scroll", icon: LuSquareCode, size: "18px" },
+  { name: "Projects", type: "link", icon: LuSquareCode, url: "/projects", size: "18px" },
   { name: "Contact", type: "scroll", icon: FiMail, size: "18px" },
   { name: "Blog", type: "link", icon: FaBlog, size: "18px", url: "/blog" },
+  { name: "Games", type: "link", icon: LuGamepad2, size: "20px", url: "/games" },
   {
     name: "Github",
     type: "link",
     icon: FaGithub,
-    url: "https://github.com/rudranarayan-01", // Replace "#" with your LinkedIn profile URL.
+    url: "https://github.com/rudranarayan-01",
     size: "18px",
   },
 ];
@@ -337,8 +338,15 @@ export const education2 = {
 export const experiences = [
   {
     role: "Full Stack Developer",
+    company:"IVTEX Corporate Solutions Pvt. Ltd.",
+    duration: "Oct 2026 – Present",
+    description:
+      "I work as a Full Stack Developer building AI-powered platforms and complex systems using Node.js and Python backends, data pipelines, and workflow automation for global clients. Alongside full-stack web and mobile applications built with Next.js, React Native, PostgreSQL, MongoDB, Supabase, Firebase, Supabase and Redis, I design scalable backend architectures with secure authentication, REST APIs, real-time features, AI integrations, and reliable deployments.",
+  },
+  {
+    role: "Full Stack Developer",
     company:"Maastrix Solutions",
-    duration: "Mar 2026 – Present",
+    duration: "Mar 2026 – Sept 2026",
     description:
       "Primarily focused on building scalable and efficient server-side systems using modern technologies, along with developing cross-platform mobile applications using React Native. Experienced in designing RESTful APIs, handling database operations, and ensuring seamless integration between frontend and backend systems. Adept at optimizing performance, debugging complex issues, and delivering robust, user-centric solutions in fast-paced development environments.",
   },
